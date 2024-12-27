@@ -35,7 +35,7 @@ def process_input(filename):
 
 if __name__ == "__main__":
     corrupted_memory = ["xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"]
-    #corrupted_memory = process_input('input-03-1.txt')
+    #corrupted_memory = process_input('input-03.txt')
 
     #total_sum = process_memory(corrupted_memory)
     total_sum = 0

@@ -52,7 +52,7 @@ def process_memory(corrupted_memory):
 
 if __name__ == "__main__":
     #corrupted_memory = ["xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"]
-    corrupted_memory = process_input('input-03-1.txt')
+    corrupted_memory = process_input('input-03.txt')
 
     total_sum = process_memory(corrupted_memory)
     print(f"Total of mul's is {total_sum}")

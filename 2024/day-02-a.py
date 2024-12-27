@@ -10,8 +10,6 @@ def process_input(filename: str) -> list[list[int]]:
     return reports
 
 def check_report(report: list[int]) -> bool:
-    # True means good report
-    # False means bad report
     if len(report) == 1:
         return True
     if report[1] == report[0]:
@@ -33,28 +31,16 @@ def check_report(report: list[int]) -> bool:
                 return False
     return True
 
-def check_damped_report(report: list[int], index: int) -> bool:
-    if index < 0 or index >= len(report):
-        return False
-    new_report = report.copy()
-    del new_report[index]
-    return check_report(new_report)
-
-def count_damped_reports(reports: list[list[int]]) -> int:
+def count_reports(reports: list[list[int]]) -> int:
     safe_reports = 0
     for report in reports:
         if check_report(report):
             safe_reports +=1
-        else:
-            for i in range(len(report)):
-                if check_damped_report(report, i):
-                    safe_reports += 1
-                    break
     return safe_reports
 
 if __name__ == "__main__":
     #reports = [[7,6,4,2,1],[1,2,7,8,9],[9,7,6,2,1],[1,3,2,4,5],[8,6,4,4,1],[1,3,6,7,9]]
     reports = process_input('input-02.txt')
 
-    safe_reports = count_damped_reports(reports)
+    safe_reports = count_reports(reports)
     print(f"Number of safe reports is {safe_reports}")

@@ -25,6 +25,6 @@ def compare_lists(list1: list[int], list2: list[int]) -> int:
 if __name__ == "__main__":
     #list1 = [3, 4, 2, 1, 3, 3]
     #list2 = [4, 3, 5, 3, 9, 3]
-    list1, list2 = process_input('input-01-1.txt')
+    list1, list2 = process_input('input-01.txt')
     distance = compare_lists(list1, list2)
     print(f"Similarity between the lists in {distance}")
