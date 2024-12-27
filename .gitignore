@@ -1,3 +1,6 @@
+# .txt files because input files are the only .txt files (or notes)
+*.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
