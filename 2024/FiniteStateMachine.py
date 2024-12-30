@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple{
 
 class FSM_State():
     # I could give each state a list of rule instad of holding a list of all rule for the FSM
