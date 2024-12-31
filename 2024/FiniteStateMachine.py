@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 class FSM_State():
     # I could give each state a list of rule instad of holding a list of all rule for the FSM
@@ -18,19 +18,16 @@ class FSM_State():
 
         
 class FSM_Rule():
-    def __init__(self, start_state: FSM_State, end_state: FSM_State, accepted_input: str):
+    def __init__(self, start_state: FSM_State, end_state: FSM_State, accepted_input: Union[str,list[str]]):
         # A FSM Rule is defined by a starting and ending state and the input that must be provided to traverse the edge.
         self.start_state = start_state
         self.end_state = end_state
-        self.accepted_inputs = [accepted_input]
+        if type(accepted_input) is str:
+            self.accepted_inputs = [accepted_input]
+        elif type(accepted_input) is list[str]:
+            self.accepted_inputs = accepted_input
         return
 
-#    def __init__(self, start_state: FSM_State, end_state: FSM_State, accepted_inputs: list[str]):
-#        self.start_state = start_state
-#        self.end_state = end_state
-#        self.accepted_inputs = accepted_inputs
-#        return
-    
     def __eq__(self, other: object) -> bool:
         # TWo FSM Rules are equal if they have the same states and accepted input
         if not isinstance(other, FSM_Rule):
