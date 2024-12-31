@@ -1,4 +1,4 @@
-from typing import Tuple{
+from typing import Tuple
 
 class FSM_State():
     # I could give each state a list of rule instad of holding a list of all rule for the FSM
@@ -22,14 +22,20 @@ class FSM_Rule():
         # A FSM Rule is defined by a starting and ending state and the input that must be provided to traverse the edge.
         self.start_state = start_state
         self.end_state = end_state
-        self.accepted_input = accepted_input
+        self.accepted_inputs = [accepted_input]
         return
 
+#    def __init__(self, start_state: FSM_State, end_state: FSM_State, accepted_inputs: list[str]):
+#        self.start_state = start_state
+#        self.end_state = end_state
+#        self.accepted_inputs = accepted_inputs
+#        return
+    
     def __eq__(self, other: object) -> bool:
         # TWo FSM Rules are equal if they have the same states and accepted input
         if not isinstance(other, FSM_Rule):
             return NotImplemented
-        return (self.start_state == other.start_state) and (self.end_state == other.end_state) and (self.accepted_input == other.accepted_input)
+        return (self.start_state == other.start_state) and (self.end_state == other.end_state) and (self.accepted_inputs == other.accepted_inputs)
         
 class FiniteStateMachine():
     def __init__(self, states: list[FSM_State], rules: list[FSM_Rule]):
@@ -54,7 +60,7 @@ class FiniteStateMachine():
     def advance_FSM(self) -> None:
         (new_char, remaining_input) = split_input(self.input_str)
         for rule in self.rules:
-            if (rule.start_state == self.current_state) and (new_char == rule.accepted_input):
+            if (rule.start_state == self.current_state) and (new_char in rule.accepted_inputs):
                 self.current_state = rule.end_state
                 self.input_str = remaining_input
                 break

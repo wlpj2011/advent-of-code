@@ -1,3 +1,4 @@
+import string
 from FiniteStateMachine import *
 
 def process_input(filename: str) -> list[str]:
@@ -43,21 +44,36 @@ if __name__ == "__main__":
     Fdo = FSM_State("fdo")
     Fdo0 = FSM_State("fdo0")
     Fdo00 = FSM_State("fdo00")
-    
-    rule00 = FSM_Rule(state0, end, "0")
-    rule11 = FSM_Rule(state1, end, "1")
-    rule01 = FSM_Rule(state0, state1, "1")
-    rule10 = FSM_Rule(state1, state0, "0")
-    rules = [ruleb0, ruleb1, rule00, rule11, rule01, rule10]
-    states = [begin, end, state0, state1]
 
-    test_FSM = FiniteStateMachine(states, rules)
+    ascii_chars = list(string.printable)
+
+    ruleTTm = FSM_Rule(T, Tm, "m")
+    ruleTTd = FSM_Rule(T, Td, "d")
+    TT_chars = ascii_chars.copy()
+    TT_chars.remove("m")
+    TT_chars.remove("d")
+    ruleTT = FSM_Rule(T, Tm, TT_chars)
+
+    ruleTmTmu = FSM_Rule(Tm, Tmu, "u")
+    TmT_chars = ascii_chars.copy()
+    TmT_chars.remove("u")
+    ruleTmT = FSM_rule(Tm, T, TmT_chars)
+
+    ruleTmuTmul = FSM_rule(Tmu, Tmul, "l")
+    TmuT_chars = ascii_chars.copy()
+    TmuT_chars.remove("l")
+    ruleTmuT = FSM_rule(Tmu, T, TmuT_chars)
+
+    #rules = [ruleb0, ruleb1, rule00, rule11, rule01, rule10]
+    #states = [begin, end, state0, state1]
+
+    #test_FSM = FiniteStateMachine(states, rules)
     input_str = "00"
-    test_FSM.add_input(input_str)
+    #test_FSM.add_input(input_str)
 
-    for _ in range(10):
-        print(test_FSM.current_state)
-        test_FSM.advance_FSM()
+    #for _ in range(10):
+    #    print(test_FSM.current_state)
+    #    test_FSM.advance_FSM()
     
 
 
