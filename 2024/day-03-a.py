@@ -1,4 +1,4 @@
-def process_input(filename):
+def process_input(filename: str) -> list[str]:
     lines = []
     with open(filename, 'r') as file:
         for line in file.readlines():
@@ -7,7 +7,7 @@ def process_input(filename):
 
 #for each instance of 'mul(' keep searching until you find a non-digit, if you find one, check to make sure it is ',', then continue searching for non-digits and make sure the next is ')'. Then continue at the next 'mul('
 
-def process_memory(corrupted_memory):
+def process_memory(corrupted_memory: list[str]) -> int:
     total_sum = 0
     max_digits = 3
     for line in corrupted_memory:
