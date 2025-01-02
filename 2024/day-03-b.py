@@ -11,13 +11,7 @@ def process_input(filename: str) -> str:
 #for each instance of 'mul(' keep searching until you find a non-digit, if you find one, check to make sure it is ',', then continue searching for non-digits and make sure the next is ')'. Then continue at the next 'mul('
 
 
-
-    
-
-if __name__ == "__main__":
-    corrupted_memory = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
-    #corrupted_memory = process_input('input-03.txt')
-
+def process_memory(corrupted_memory: str) -> int:
     states = []
     
     T = FSM_State("begin")
@@ -162,6 +156,13 @@ if __name__ == "__main__":
     ruleTmul0dcd3T = FSM_Rule(Tmul0dcd3, T, Tmul0dcd3T_chars)
     rules.append(ruleTmul0dcd3T)
 
+    ruleTmul0dcd0Tm = FSM_Rule(Tmul0dcd0, Tm, "m")
+    rules.append(ruleTmul0dcd0Tm)
+    Tmul0dcd0T_chars = ascii_chars.copy()
+    Tmul0dcd0T_chars.remove("m")
+    ruleTmul0dcd0T = FSM_Rule(Tmul0dcd0, T, Tmul0dcd0T_chars)
+    rules.append(ruleTmul0dcd0T)
+    
     ruleTTd = FSM_Rule(T, Td, "d")
     rules.append(ruleTTd)
 
@@ -243,13 +244,43 @@ if __name__ == "__main__":
     #for _ in range(10):
     #    print(test_FSM.current_state)
     #    test_FSM.advance_FSM()
-    
+    total_sum = 0
+    digit1 = 0
+    digit2 = 0
+    digits = ''
     while len(mul_FSM.input_str) > 0:
-        print(mul_FSM.input_str[0])
-        print(mul_FSM.current_state, mul_FSM.input_str)
+        #print(mul_FSM.current_state, mul_FSM.input_str)
         mul_FSM.advance_FSM()
+        if mul_FSM.current_state == FSM_State('tmul0'):
+            digit1 = 0
+            digit2 = 0
+            digits = mul_FSM.input_str[:7]
+        elif mul_FSM.current_state == FSM_State('tmul0d1'):
+            digit1 = int(digits[:1])
+        elif mul_FSM.current_state == FSM_State('tmul0d2'):
+            digit1 = int(digits[:2])
+        elif mul_FSM.current_state == FSM_State('tmul0d3'):
+            digit1 = int(digits[:3])
+        elif mul_FSM.current_state == FSM_State('tmul0dcd1'):
+            digit2 = int(digits[len(str(digit1)) + 1:len(str(digit1)) + 2])
+        elif mul_FSM.current_state == FSM_State('tmul0dcd2'):
+            digit2 = int(digits[len(str(digit1)) + 1:len(str(digit1)) + 3])
+        elif mul_FSM.current_state == FSM_State('tmul0dcd3'):
+            digit2 = int(digits[len(str(digit1)) + 1:len(str(digit1)) + 4])
+        elif mul_FSM.current_state == FSM_State('tmul0dcd0'):
+            total_sum += digit1 * digit2
+            digit1 = 0
+            digit2 = 0
+            digits = ''
+    return total_sum
 
     
-    #total_sum = process_memory(corrupted_memory)
-    total_sum = 0
+
+if __name__ == "__main__":
+    #corrupted_memory = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+    corrupted_memory = process_input('input-03.txt')
+
+    
+    total_sum = process_memory(corrupted_memory)
+
     print(f"Total of mul's is {total_sum}")

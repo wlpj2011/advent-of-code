@@ -36,6 +36,7 @@ class FSM_Rule():
         return (self.start_state == other.start_state) and (self.end_state == other.end_state) and (self.accepted_inputs == other.accepted_inputs)
         
 class FiniteStateMachine():
+    # Would probably be better to have an index moving through the input string instead of continually copying it...
     def __init__(self, states: list[FSM_State], rules: list[FSM_Rule]):
         self.states = states
         self.rules = rules
@@ -65,6 +66,7 @@ class FiniteStateMachine():
                     self.current_state = rule.end_state
                     self.input_str = remaining_input
                     return
+        print(f"Found no rule matching {new_char} while in state {self.current_state}")
         sys.exit(1)
     
             
