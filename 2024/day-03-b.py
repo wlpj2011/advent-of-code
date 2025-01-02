@@ -1,11 +1,11 @@
 import string
 from FiniteStateMachine import *
 
-def process_input(filename: str) -> list[str]:
-    lines = []
+def process_input(filename: str) -> str:
+    lines = ''
     with open(filename, 'r') as file:
         for line in file.readlines():
-            lines.append(line)
+            lines += line
     return lines
 
 #for each instance of 'mul(' keep searching until you find a non-digit, if you find one, check to make sure it is ',', then continue searching for non-digits and make sure the next is ')'. Then continue at the next 'mul('
@@ -15,12 +15,12 @@ def process_input(filename: str) -> list[str]:
     
 
 if __name__ == "__main__":
-    corrupted_memory = ["xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"]
+    corrupted_memory = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
     #corrupted_memory = process_input('input-03.txt')
 
     states = []
     
-    T = FSM_State("true")
+    T = FSM_State("begin")
     states.append(T)
     F = FSM_State("false")
     states.append(F)
@@ -236,15 +236,18 @@ if __name__ == "__main__":
     rules.append(ruleFdo0F)
     
 
-    #test_FSM = FiniteStateMachine(states, rules)
-    input_str = "00"
+    mul_FSM = FiniteStateMachine(states, rules)
+    mul_FSM.add_input(corrupted_memory)
     #test_FSM.add_input(input_str)
 
     #for _ in range(10):
     #    print(test_FSM.current_state)
     #    test_FSM.advance_FSM()
     
-
+    while len(mul_FSM.input_str) > 0:
+        print(mul_FSM.input_str[0])
+        print(mul_FSM.current_state, mul_FSM.input_str)
+        mul_FSM.advance_FSM()
 
     
     #total_sum = process_memory(corrupted_memory)

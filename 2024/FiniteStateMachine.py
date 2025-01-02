@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple, Union
 
 class FSM_State():
@@ -24,7 +25,7 @@ class FSM_Rule():
         self.end_state = end_state
         if type(accepted_input) is str:
             self.accepted_inputs = [accepted_input]
-        elif type(accepted_input) is list[str]:
+        elif type(accepted_input) is list:
             self.accepted_inputs = accepted_input
         return
 
@@ -56,11 +57,16 @@ class FiniteStateMachine():
 
     def advance_FSM(self) -> None:
         (new_char, remaining_input) = split_input(self.input_str)
+        self.input_str = remaining_input
         for rule in self.rules:
-            if (rule.start_state == self.current_state) and (new_char in rule.accepted_inputs):
-                self.current_state = rule.end_state
-                self.input_str = remaining_input
-                break
+            if (rule.start_state == self.current_state):
+                #print(rule.accepted_inputs)
+                if new_char in rule.accepted_inputs:
+                    self.current_state = rule.end_state
+                    self.input_str = remaining_input
+                    return
+        sys.exit(1)
+    
             
 def split_input(input_str: str) -> Tuple[str, str]:
     return input_str[0], input_str[1:]
