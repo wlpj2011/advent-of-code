@@ -57,7 +57,7 @@ def modify_update(update: list[int], rules: list[Tuple[int, int]]) -> bool:
                         return False
     return True
 
-def fix_update(update: list[int], rules: list[Tuple[int, int]]):
+def fix_update(update: list[int], rules: list[Tuple[int, int]]) -> None:
     while not modify_update(update, rules):
         continue
 
