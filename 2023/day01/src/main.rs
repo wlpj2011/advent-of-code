@@ -10,13 +10,40 @@ struct Args {
     /// File to run solution code on
     #[arg()]
     file: String,
+
+    #[clap(flatten)]
+    group: Group,
+}
+
+#[derive(Parser, Debug)]
+#[group(required = true)]
+struct Group {
+      /// Run solution to part a of day 1.
+      #[arg(short, default_value = "true")]
+      a: bool,
+  
+      /// Run solution to part b of day 1.
+      #[arg(short)]
+      b: bool,
 }
 
 fn calibration_value(line: &str) -> Result<u64> {
     Ok(0)
 }
 
-fn solution(file: File) -> Result<u64> {
+fn solution_a(file: File) -> Result<u64> {
+    let mut result: u64 = 0;
+
+    let mut reader = BufReader::new(file);
+    let mut line = String::new();
+    let len = reader.read_line(&mut line);
+
+    result += calibration_value(&line)?;
+
+    Ok(result)
+}
+
+fn solution_b(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
     let mut reader = BufReader::new(file);
@@ -31,10 +58,19 @@ fn solution(file: File) -> Result<u64> {
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    let file = File::open(args.file)?;
-    let result = solution(file)?;
-
-    println!("The sum of the calibration values is {result}.");
+    if args.group.a {
+        let file = File::open(args.file.clone())?;
+        let result = solution_a(file)?;
+    
+        println!("The sum of the calibration values is {result}.");
+    }
+    if args.group.b {
+        let file = File::open(args.file.clone())?;
+        let result = solution_b(file)?;
+    
+        println!("The sum of the calibration values is {result}.");
+    }
+    
 
     Ok(())
 }
@@ -46,7 +82,7 @@ mod tests {
 
     #[test]
     fn test_solution() -> Result<()> {
-        assert_eq!(solution(File::open("test-input-01.txt")?)?, 142);
+        assert_eq!(solution_a(File::open("test-input-01.txt")?)?, 142);
         Ok(())
     }
 
