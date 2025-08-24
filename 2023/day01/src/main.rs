@@ -61,8 +61,22 @@ fn find_last_digit(line: &str) -> Result<u64> {
     Err(LogicError::NoDigits(line.to_string()).into())
 }
 
+fn find_first_digit_w_text(line: &str) -> Result<u64> {
+    Ok(0)
+}
+
+fn find_last_digit_w_text(line: &str) -> Result<u64> {
+    Ok(0)
+}
+
 fn calibration_value(line: &str) -> Result<u64> {
     let result = 10 * find_first_digit(line)? + find_last_digit(line)?;
+
+    Ok(result)
+}
+
+fn calibration_value_w_text(line: &str) -> Result<u64> {
+    let result = 10 * find_first_digit_w_text(line)? + find_last_digit_w_text(line)?;
 
     Ok(result)
 }
@@ -86,9 +100,11 @@ fn solution_b(file: File) -> Result<u64> {
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
-    let len = reader.read_line(&mut line);
 
-    result += calibration_value(&line)?;
+    while reader.read_line(&mut line)? != 0 {
+        result += calibration_value_w_text(&line)?;
+        line.clear()
+    }
 
     Ok(result)
 }
@@ -119,7 +135,13 @@ mod tests {
 
     #[test]
     fn test_solution_a() -> Result<()> {
-        assert_eq!(solution_a(File::open("test-input-01.txt")?)?, 142);
+        assert_eq!(solution_a(File::open("test-input-01a.txt")?)?, 142);
+        Ok(())
+    }
+
+    #[test]
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-01b.txt")?)?, 281);
         Ok(())
     }
 
@@ -148,6 +170,48 @@ mod tests {
     }
 
     #[test]
+    fn test_calibration_w_text_1() -> Result<()> {
+        assert_eq!(calibration_value("two1nine")?, 29);
+        Ok(())
+    }
+
+    #[test]
+    fn test_calibration_w_text_2() -> Result<()> {
+        assert_eq!(calibration_value("eightwothree")?, 83);
+        Ok(())
+    }
+
+    #[test]
+    fn test_calibration_w_text_3() -> Result<()> {
+        assert_eq!(calibration_value("abcone2threexyz")?, 13);
+        Ok(())
+    }
+
+    #[test]
+    fn test_calibration_w_text_4() -> Result<()> {
+        assert_eq!(calibration_value("xtwone3four")?, 24);
+        Ok(())
+    }
+
+    #[test]
+    fn test_calibration_w_text_5() -> Result<()> {
+        assert_eq!(calibration_value("4nineeightseven2")?, 42);
+        Ok(())
+    }
+
+    #[test]
+    fn test_calibration_w_text_6() -> Result<()> {
+        assert_eq!(calibration_value("zoneight234")?, 14);
+        Ok(())
+    }
+
+    #[test]
+    fn test_calibration_w_text_7() -> Result<()> {
+        assert_eq!(calibration_value("7pqrstsixteen")?, 76);
+        Ok(())
+    }
+
+    #[test]
     fn test_find_first_digit_1() -> Result<()> {
         assert_eq!(find_first_digit("a1b2c3d4e5f")?, 1);
         Ok(())
@@ -160,6 +224,18 @@ mod tests {
     }
 
     #[test]
+    fn test_find_first_digit__w_text_1() -> Result<()> {
+        assert_eq!(find_first_digit("two1nine")?, 2);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_first_digit_w_text_2() -> Result<()> {
+        assert_eq!(find_first_digit("4nineeightseven2")?, 4);
+        Ok(())
+    }
+
+    #[test]
     fn test_find_last_digit_1() -> Result<()> {
         assert_eq!(find_last_digit("a1b2c3d4e5f")?, 5);
         Ok(())
@@ -168,6 +244,18 @@ mod tests {
     #[test]
     fn test_find_last_digit_2() -> Result<()> {
         assert_eq!(find_last_digit("treb7uchet")?, 7);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_last_digit_w_text_1() -> Result<()> {
+        assert_eq!(find_last_digit("abcone2threexyz")?, 3);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_last_digit_w_text_2() -> Result<()> {
+        assert_eq!(find_last_digit("zoneight234")?, 4);
         Ok(())
     }
 }
