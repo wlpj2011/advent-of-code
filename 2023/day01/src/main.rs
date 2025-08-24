@@ -1,8 +1,16 @@
+//use anyhow::Error;
 use anyhow::Result;
 use clap::Parser;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+enum LogicError {
+    #[error("String {0} contains no digits")]
+    NoDigits(String),
+}
 
 /// Program to solve Day 1 of 2023 Advent of Code
 #[derive(Parser, Debug)]
@@ -18,17 +26,45 @@ struct Args {
 #[derive(Parser, Debug)]
 #[group(required = true)]
 struct Group {
-      /// Run solution to part a of day 1.
-      #[arg(short, default_value = "true")]
-      a: bool,
-  
-      /// Run solution to part b of day 1.
-      #[arg(short)]
-      b: bool,
+    /// Run solution to part a of day 1.
+    #[arg(short, default_value = "true")]
+    a: bool,
+
+    /// Run solution to part b of day 1.
+    #[arg(short)]
+    b: bool,
+}
+
+fn find_first_digit(line: &str) -> Result<u64> {
+    let result: char;
+    let chars = line.chars();
+    for char in chars {
+        if char.is_ascii_digit() {
+            result = char;
+            return Ok(char::to_digit(result, 10).unwrap() as u64);
+        }
+    }
+    Err(LogicError::NoDigits(line.to_string()).into())
+}
+
+fn find_last_digit(line: &str) -> Result<u64> {
+    let mut result: char = ' ';
+    let chars = line.chars();
+    if chars.clone().count() > 0 {
+        for char in chars {
+            if char.is_ascii_digit() {
+                result = char;
+            }
+        }
+        return Ok(char::to_digit(result, 10).unwrap() as u64);
+    }
+    Err(LogicError::NoDigits(line.to_string()).into())
 }
 
 fn calibration_value(line: &str) -> Result<u64> {
-    Ok(0)
+    let result = 10 * find_first_digit(line)? + find_last_digit(line)?;
+
+    Ok(result)
 }
 
 fn solution_a(file: File) -> Result<u64> {
@@ -36,9 +72,11 @@ fn solution_a(file: File) -> Result<u64> {
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
-    let len = reader.read_line(&mut line);
 
-    result += calibration_value(&line)?;
+    while reader.read_line(&mut line)? != 0 {
+        result += calibration_value(&line)?;
+        line.clear()
+    }
 
     Ok(result)
 }
@@ -61,16 +99,15 @@ fn main() -> Result<()> {
     if args.group.a {
         let file = File::open(args.file.clone())?;
         let result = solution_a(file)?;
-    
+
         println!("The sum of the calibration values is {result}.");
     }
     if args.group.b {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
-    
+
         println!("The sum of the calibration values is {result}.");
     }
-    
 
     Ok(())
 }
@@ -81,7 +118,7 @@ mod tests {
     use anyhow::Result;
 
     #[test]
-    fn test_solution() -> Result<()> {
+    fn test_solution_a() -> Result<()> {
         assert_eq!(solution_a(File::open("test-input-01.txt")?)?, 142);
         Ok(())
     }
@@ -107,6 +144,30 @@ mod tests {
     #[test]
     fn test_calibration_4() -> Result<()> {
         assert_eq!(calibration_value("treb7uchet")?, 77);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_first_digit_1() -> Result<()> {
+        assert_eq!(find_first_digit("a1b2c3d4e5f")?, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_first_digit_2() -> Result<()> {
+        assert_eq!(find_first_digit("treb7uchet")?, 7);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_last_digit_1() -> Result<()> {
+        assert_eq!(find_last_digit("a1b2c3d4e5f")?, 5);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_last_digit_2() -> Result<()> {
+        assert_eq!(find_last_digit("treb7uchet")?, 7);
         Ok(())
     }
 }
