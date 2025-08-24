@@ -11,6 +11,7 @@ enum LogicError {
     NoDigits(String),
 }
 
+// Program to solve Day 1 of 2023 Advent of Code
 #[derive(Parser, Debug)]
 struct Args {
     /// File to run solution code on
@@ -196,7 +197,6 @@ fn solution_b(file: File) -> Result<u64> {
 }
 
 fn main() -> Result<()> {
-    // Program to solve Day 1 of 2023 Advent of Code
     let args = Args::parse();
 
     if args.group.a {
