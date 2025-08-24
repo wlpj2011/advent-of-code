@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //use anyhow::Error;
 use anyhow::Result;
 use clap::Parser;
@@ -12,7 +13,6 @@ enum LogicError {
     NoDigits(String),
 }
 
-/// Program to solve Day 1 of 2023 Advent of Code
 #[derive(Parser, Debug)]
 struct Args {
     /// File to run solution code on
@@ -27,7 +27,7 @@ struct Args {
 #[group(required = true)]
 struct Group {
     /// Run solution to part a of day 1.
-    #[arg(short, default_value = "true")]
+    #[arg(short)]
     a: bool,
 
     /// Run solution to part b of day 1.
@@ -41,7 +41,7 @@ fn find_first_digit(line: &str) -> Result<u64> {
     for char in chars {
         if char.is_ascii_digit() {
             result = char;
-            return Ok(char::to_digit(result, 10).unwrap() as u64);
+            return Ok(result.to_digit(10).unwrap() as u64);
         }
     }
     Err(LogicError::NoDigits(line.to_string()).into())
@@ -62,11 +62,101 @@ fn find_last_digit(line: &str) -> Result<u64> {
 }
 
 fn find_first_digit_w_text(line: &str) -> Result<u64> {
-    Ok(0)
+    let mut result: String;
+    for (i, char) in line.char_indices() {
+        for j in i..usize::min(line.len() - i, i + 5) {
+            // i is the position of the first character of the string, j is the position of the last character of the string
+            // if i = j, check if is digit
+            // if [i,j].len() >= 3, check if is one, two, three, four, etc...
+            // return once either of these happen
+            if i == j {
+                // only looking at one char
+                if char.is_ascii_digit() {
+                    return Ok(char.to_digit(10).unwrap() as u64);
+                }
+            } else if j - i == 2 {
+                // looking at three chars
+                if &line[i..=j] == "one" {
+                    return Ok(1);
+                } else if &line[i..=j] == "two" {
+                    return Ok(2);
+                } else if &line[i..=j] == "six" {
+                    return Ok(6);
+                }
+            } else if j - i == 3 {
+                // looking at four chars
+                if &line[i..=j] == "four" {
+                    return Ok(4);
+                } else if &line[i..=j] == "five" {
+                    return Ok(5);
+                } else if &line[i..=j] == "nine" {
+                    return Ok(9);
+                } else if &line[i..=j] == "zero" {
+                    return Ok(0);
+                }
+            } else if j - i == 4 {
+                // looking at five chars
+                if &line[i..=j] == "three" {
+                    return Ok(3);
+                } else if &line[i..=j] == "seven" {
+                    return Ok(7);
+                } else if &line[i..=j] == "eight" {
+                    return Ok(8);
+                }
+            }
+        }
+    }
+    Err(LogicError::NoDigits(line.to_string()).into())
 }
 
 fn find_last_digit_w_text(line: &str) -> Result<u64> {
-    Ok(0)
+    let mut result: String;
+    for (i_rev, char) in line.chars().rev().enumerate() {
+        for j_rev in i_rev..usize::min(line.len() - i_rev, i_rev + 5) {
+            let j = line.len() - i_rev - 1;
+            let i = line.len() - j_rev - 1;
+            // i is the position of the last character of the string, j is the position of the first character of the string
+            // if i = j, check if is digit
+            // if [i,j].len() >= 3, check if is one, two, three, four, etc...
+            // return once either of these happen
+            if i == j {
+                // only looking at one char
+                if char.is_ascii_digit() {
+                    return Ok(char.to_digit(10).unwrap() as u64);
+                }
+            } else if j - i == 2 {
+                // looking at three chars
+                if &line[i..=j] == "one" {
+                    return Ok(1);
+                } else if &line[i..=j] == "two" {
+                    return Ok(2);
+                } else if &line[i..=j] == "six" {
+                    return Ok(6);
+                }
+            } else if j - i == 3 {
+                // looking at four chars
+                if &line[i..=j] == "four" {
+                    return Ok(4);
+                } else if &line[i..=j] == "five" {
+                    return Ok(5);
+                } else if &line[i..=j] == "nine" {
+                    return Ok(9);
+                } else if &line[i..=j] == "zero" {
+                    return Ok(0);
+                }
+            } else if j - i == 4 {
+                // looking at five chars
+                if &line[i..=j] == "three" {
+                    return Ok(3);
+                } else if &line[i..=j] == "seven" {
+                    return Ok(7);
+                } else if &line[i..=j] == "eight" {
+                    return Ok(8);
+                }
+            }
+        }
+    }
+    Err(LogicError::NoDigits(line.to_string()).into())
 }
 
 fn calibration_value(line: &str) -> Result<u64> {
@@ -110,6 +200,7 @@ fn solution_b(file: File) -> Result<u64> {
 }
 
 fn main() -> Result<()> {
+    // Program to solve Day 1 of 2023 Advent of Code
     let args = Args::parse();
 
     if args.group.a {
@@ -171,43 +262,43 @@ mod tests {
 
     #[test]
     fn test_calibration_w_text_1() -> Result<()> {
-        assert_eq!(calibration_value("two1nine")?, 29);
+        assert_eq!(calibration_value_w_text("two1nine")?, 29);
         Ok(())
     }
 
     #[test]
     fn test_calibration_w_text_2() -> Result<()> {
-        assert_eq!(calibration_value("eightwothree")?, 83);
+        assert_eq!(calibration_value_w_text("eightwothree")?, 83);
         Ok(())
     }
 
     #[test]
     fn test_calibration_w_text_3() -> Result<()> {
-        assert_eq!(calibration_value("abcone2threexyz")?, 13);
+        assert_eq!(calibration_value_w_text("abcone2threexyz")?, 13);
         Ok(())
     }
 
     #[test]
     fn test_calibration_w_text_4() -> Result<()> {
-        assert_eq!(calibration_value("xtwone3four")?, 24);
+        assert_eq!(calibration_value_w_text("xtwone3four")?, 24);
         Ok(())
     }
 
     #[test]
     fn test_calibration_w_text_5() -> Result<()> {
-        assert_eq!(calibration_value("4nineeightseven2")?, 42);
+        assert_eq!(calibration_value_w_text("4nineeightseven2")?, 42);
         Ok(())
     }
 
     #[test]
     fn test_calibration_w_text_6() -> Result<()> {
-        assert_eq!(calibration_value("zoneight234")?, 14);
+        assert_eq!(calibration_value_w_text("zoneight234")?, 14);
         Ok(())
     }
 
     #[test]
     fn test_calibration_w_text_7() -> Result<()> {
-        assert_eq!(calibration_value("7pqrstsixteen")?, 76);
+        assert_eq!(calibration_value_w_text("7pqrstsixteen")?, 76);
         Ok(())
     }
 
@@ -224,14 +315,14 @@ mod tests {
     }
 
     #[test]
-    fn test_find_first_digit__w_text_1() -> Result<()> {
-        assert_eq!(find_first_digit("two1nine")?, 2);
+    fn test_find_first_digit_w_text_1() -> Result<()> {
+        assert_eq!(find_first_digit_w_text("two1nine")?, 2);
         Ok(())
     }
 
     #[test]
     fn test_find_first_digit_w_text_2() -> Result<()> {
-        assert_eq!(find_first_digit("4nineeightseven2")?, 4);
+        assert_eq!(find_first_digit_w_text("4nineeightseven2")?, 4);
         Ok(())
     }
 
@@ -249,13 +340,13 @@ mod tests {
 
     #[test]
     fn test_find_last_digit_w_text_1() -> Result<()> {
-        assert_eq!(find_last_digit("abcone2threexyz")?, 3);
+        assert_eq!(find_last_digit_w_text("abcone2threexyz")?, 3);
         Ok(())
     }
 
     #[test]
     fn test_find_last_digit_w_text_2() -> Result<()> {
-        assert_eq!(find_last_digit("zoneight234")?, 4);
+        assert_eq!(find_last_digit_w_text("zoneight234")?, 4);
         Ok(())
     }
 }
