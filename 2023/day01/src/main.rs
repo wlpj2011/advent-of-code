@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-//use anyhow::Error;
 use anyhow::Result;
 use clap::Parser;
 use std::fs::File;
@@ -62,9 +60,8 @@ fn find_last_digit(line: &str) -> Result<u64> {
 }
 
 fn find_first_digit_w_text(line: &str) -> Result<u64> {
-    let mut result: String;
     for (i, char) in line.char_indices() {
-        for j in i..usize::min(line.len() - i, i + 5) {
+        for j in i..usize::min(line.len(), i + 5) {
             // i is the position of the first character of the string, j is the position of the last character of the string
             // if i = j, check if is digit
             // if [i,j].len() >= 3, check if is one, two, three, four, etc...
@@ -110,9 +107,8 @@ fn find_first_digit_w_text(line: &str) -> Result<u64> {
 }
 
 fn find_last_digit_w_text(line: &str) -> Result<u64> {
-    let mut result: String;
     for (i_rev, char) in line.chars().rev().enumerate() {
-        for j_rev in i_rev..usize::min(line.len() - i_rev, i_rev + 5) {
+        for j_rev in i_rev..usize::min(line.len(), i_rev + 5) {
             let j = line.len() - i_rev - 1;
             let i = line.len() - j_rev - 1;
             // i is the position of the last character of the string, j is the position of the first character of the string
@@ -327,6 +323,18 @@ mod tests {
     }
 
     #[test]
+    fn test_find_first_digit_w_text_3() -> Result<()> {
+        assert_eq!(find_first_digit_w_text("jprxbcghdgxhk9x")?, 9);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_first_digit_w_text_4() -> Result<()> {
+        assert_eq!(find_first_digit_w_text("8czzpmvgmlchnkf")?, 8);
+        Ok(())
+    }
+
+    #[test]
     fn test_find_last_digit_1() -> Result<()> {
         assert_eq!(find_last_digit("a1b2c3d4e5f")?, 5);
         Ok(())
@@ -347,6 +355,18 @@ mod tests {
     #[test]
     fn test_find_last_digit_w_text_2() -> Result<()> {
         assert_eq!(find_last_digit_w_text("zoneight234")?, 4);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_last_digit_w_text_3() -> Result<()> {
+        assert_eq!(find_last_digit_w_text("jprxbcghdgxhk9x")?, 9);
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_last_digit_w_text_4() -> Result<()> {
+        assert_eq!(find_last_digit_w_text("8czzpmvgmlchnkf")?, 8);
         Ok(())
     }
 }
