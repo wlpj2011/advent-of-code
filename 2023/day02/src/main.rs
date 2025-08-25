@@ -35,12 +35,8 @@ struct Turn {
 }
 
 impl Turn {
-    fn from_tuple(turn: (u64, u64, u64)) -> Turn {
-        Turn {
-            red: turn.0,
-            green: turn.1,
-            blue: turn.2,
-        }
+    fn from_str(turn_str:&str) -> Result<Turn> {
+        todo!();
     }
 
     fn is_valid(&self, bounds: (u64, u64, u64)) -> bool {
@@ -68,38 +64,7 @@ impl Game {
             } else {
                 let turns_str = part.split(";").collect::<Vec<&str>>();
                 for turn_str in turns_str.iter() {
-                    let mut turn_vec = (*turn_str).split(",").collect::<Vec<&str>>();
-                    turns.push(Turn {
-                        red: turn_vec
-                            .pop()
-                            .unwrap()
-                            .split(" ")
-                            .collect::<Vec<&str>>()
-                            .pop()
-                            .unwrap()
-                            .parse()
-                            .expect("Every string representing a game must have a red component."),
-                        green: turn_vec
-                            .pop()
-                            .unwrap()
-                            .split(" ")
-                            .collect::<Vec<&str>>()
-                            .pop()
-                            .unwrap()
-                            .parse()
-                            .expect(
-                                "Every string representing a game must have a green component.",
-                            ),
-                        blue: turn_vec
-                            .pop()
-                            .unwrap()
-                            .split(" ")
-                            .collect::<Vec<&str>>()
-                            .pop()
-                            .unwrap()
-                            .parse()
-                            .expect("Every string representing a game must have a blue component."),
-                    })
+                    turns.push(Turn::from_str(turn_str)?);
                 }
             }
         }
