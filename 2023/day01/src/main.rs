@@ -11,7 +11,7 @@ enum LogicError {
     NoDigits(String),
 }
 
-// Program to solve Day 1 of 2023 Advent of Code
+/// Program to solve Day 1 of 2023 Advent of Code
 #[derive(Parser, Debug)]
 struct Args {
     /// File to run solution code on
