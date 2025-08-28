@@ -35,7 +35,7 @@ struct Turn {
 }
 
 impl Turn {
-    fn from_str(turn_str:&str) -> Result<Turn> {
+    fn from_string(turn_str: &str) -> Result<Turn> {
         todo!();
     }
 
@@ -64,7 +64,7 @@ impl Game {
             } else {
                 let turns_str = part.split(";").collect::<Vec<&str>>();
                 for turn_str in turns_str.iter() {
-                    turns.push(Turn::from_str(turn_str)?);
+                    turns.push(Turn::from_string(turn_str)?);
                 }
             }
         }
@@ -131,6 +131,58 @@ mod tests {
     #[test]
     fn test_solution_a() -> Result<()> {
         assert_eq!(solution_a(File::open("test-input-02.txt")?)?, 8);
+        Ok(())
+    }
+
+    #[test]
+    fn test_turn_from_string_1() -> Result<()> {
+        assert_eq!(
+            Turn::from_string("4 red, 2 green, 3 blue,")?,
+            Turn {
+                red: 4,
+                green: 2,
+                blue: 3,
+            }
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_turn_from_string_2() -> Result<()> {
+        assert_eq!(
+            Turn::from_string("3 blue, 4 red")?,
+            Turn {
+                red: 4,
+                green: 0,
+                blue: 3,
+            }
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_turn_from_string_3() -> Result<()> {
+        assert_eq!(
+            Turn::from_string("1 blue")?,
+            Turn {
+                red: 0,
+                green: 0,
+                blue: 1,
+            }
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_turn_from_string_4() -> Result<()> {
+        assert_eq!(
+            Turn::from_string("1 red, 2 green")?,
+            Turn {
+                red: 1,
+                green: 2,
+                blue: 0,
+            }
+        );
         Ok(())
     }
 
