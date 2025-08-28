@@ -35,8 +35,31 @@ struct Turn {
 }
 
 impl Turn {
-    fn from_string(turn_str: &str) -> Result<Turn> {
-        todo!();
+    fn from_string(turn_str:  &str) -> Result<Turn> {
+        // Note this only works for turns where each color only appears once.
+        // Should improve this to be white
+        let turn_parts: Vec<_> = turn_str.split(',').collect();
+        let mut turn = (0, 0, 0);
+        for part in turn_parts.iter() {
+            let part = part.trim();
+            let num_color = part.split(" ").collect::<Vec<&str>>();
+            let num = num_color[0];
+            let color = num_color[1];
+            let num = num.parse::<u64>()?;
+            if color == "red" {
+                turn.0 = num;
+            } else if color == "green" {
+                turn.1 = num;
+            } else if color == "blue" {
+                turn.2 = num;
+            }
+        }
+
+        Ok(Turn {
+            red: turn.0,
+            green: turn.1,
+            blue: turn.2,
+        })
     }
 
     fn is_valid(&self, bounds: (u64, u64, u64)) -> bool {
@@ -87,6 +110,8 @@ fn solution_a(file: File) -> Result<u64> {
     let mut line = String::new();
     while reader.read_line(&mut line)? != 0 {
         let game = Game::from_string(&line, (12, 13, 14))?;
+
+        dbg!(&game);
         if game.is_valid() {
             result += game.index;
         }
@@ -137,7 +162,7 @@ mod tests {
     #[test]
     fn test_turn_from_string_1() -> Result<()> {
         assert_eq!(
-            Turn::from_string("4 red, 2 green, 3 blue,")?,
+            Turn::from_string(" 4 red, 2 green, 3 blue")?,
             Turn {
                 red: 4,
                 green: 2,
@@ -150,7 +175,7 @@ mod tests {
     #[test]
     fn test_turn_from_string_2() -> Result<()> {
         assert_eq!(
-            Turn::from_string("3 blue, 4 red")?,
+            Turn::from_string(" 3 blue, 4 red")?,
             Turn {
                 red: 4,
                 green: 0,
