@@ -65,6 +65,18 @@ impl Turn {
     fn is_valid(&self, bounds: (u64, u64, u64)) -> bool {
         (self.red <= bounds.0) && (self.green <= bounds.1) && (self.blue <= bounds.2)
     }
+
+    fn max(&self, other: &Turn) -> Turn {
+        Turn {
+            red: u64::max(self.red, other.red),
+            green: u64::max(self.green, other.green),
+            blue: u64::max(self.blue, other.blue),
+        }
+    }
+
+    fn power(&self) -> u64 {
+        self.red * self.green * self.blue
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -125,7 +137,19 @@ fn solution_b(file: File) -> Result<u64> {
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
-    while reader.read_line(&mut line)? != 0 {}
+    while reader.read_line(&mut line)? != 0 {
+        let mut current_max = Turn {
+            red: 0,
+            green: 0,
+            blue: 0,
+        };
+        let game = Game::from_string(&line, (12, 13, 14))?;
+        for turn in game.turns {
+            current_max = current_max.max(&turn);
+        }
+        result += current_max.power();
+        line.clear();
+    }
     Ok(result)
 }
 
@@ -142,7 +166,7 @@ fn main() -> Result<()> {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
 
-        println!("The sum of the calibration values is {result}.");
+        println!("The sum of the powers is {result}.");
     }
 
     Ok(())
@@ -156,6 +180,12 @@ mod tests {
     #[test]
     fn test_solution_a() -> Result<()> {
         assert_eq!(solution_a(File::open("test-input-02.txt")?)?, 8);
+        Ok(())
+    }
+
+    #[test]
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-02.txt")?)?, 2286);
         Ok(())
     }
 
