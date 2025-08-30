@@ -35,7 +35,7 @@ struct Turn {
 }
 
 impl Turn {
-    fn from_string(turn_str:  &str) -> Result<Turn> {
+    fn from_string(turn_str: &str) -> Result<Turn> {
         // Note this only works for turns where each color only appears once.
         // Should improve this to be white
         let turn_parts: Vec<_> = turn_str.split(',').collect();
@@ -63,7 +63,7 @@ impl Turn {
     }
 
     fn is_valid(&self, bounds: (u64, u64, u64)) -> bool {
-        (self.red <= bounds.0) && (self.green <= bounds.0) && (self.blue <= bounds.0)
+        (self.red <= bounds.0) && (self.green <= bounds.1) && (self.blue <= bounds.2)
     }
 }
 
@@ -111,10 +111,10 @@ fn solution_a(file: File) -> Result<u64> {
     while reader.read_line(&mut line)? != 0 {
         let game = Game::from_string(&line, (12, 13, 14))?;
 
-        dbg!(&game);
         if game.is_valid() {
             result += game.index;
         }
+        line.clear();
     }
 
     Ok(result)
