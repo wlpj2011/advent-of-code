@@ -1,4 +1,5 @@
 use anyhow::Result;
+use clap::builder::Str;
 use clap::Parser;
 use std::fs::File;
 use std::io::BufReader;
@@ -27,14 +28,39 @@ struct Group {
       b: bool,
 }
 
+const SYMBOLS: &str = "!@#$%^&*()_-+=|\\<>,?/;:~`";
 
+#[derive(Debug, Clone)]
+struct Context {
+    line1: String,
+    line2: String,
+    line3: String,
+}
+
+impl Context {
+    fn from_str(line: &str) -> Context{
+        Context {line1: "".to_string(), line2: "".to_string(), line3: line.to_string()}
+    }
+
+    fn update_context(&mut self, new_line: &str) {
+        self.line1 = self.line2.clone();
+        self.line2 = self.line3.clone();
+        self.line3 = new_line.to_string();
+    }
+
+    fn find_parts() ->  Vec<u64> {
+        todo!()
+    }
+}
 fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
+    let mut context: Context = Context::from_str(&line);
     while reader.read_line(&mut line)? != 0 {
-        
+        context.update_context(&line);
+        dbg!(&context);
     }
     Ok(result)
 }
@@ -57,7 +83,7 @@ fn main() -> Result<()> {
         let file = File::open(args.file.clone())?;
         let result = solution_a(file)?;
     
-        println!("The sum of the calibration values is {result}.");
+        println!("The sum of the engine part numbers is {result}.");
     }
     if args.group.b {
         let file = File::open(args.file.clone())?;
