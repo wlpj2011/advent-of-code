@@ -29,6 +29,16 @@ struct Group {
 }
 
 const SYMBOLS: &str = "!@#$%^&*()_-+=|\\<>,?/;:~`";
+const DIRECTIONS: [(i64, i64); 8] = [
+    (1, 0),
+    (1, -1),
+    (0, -1),
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+];
 
 #[derive(Debug, Clone)]
 struct Context {
@@ -52,10 +62,53 @@ impl Context {
         self.line3 = new_line.to_string();
     }
 
-    fn find_parts(&self) -> Vec<u64> {
-        let parts = Vec::new();
+    fn find_parts(&self) -> Result<Vec<u64>> {
+        let mut parts = Vec::new();
+        let mut part = 0;
+        let mut end_current_part: usize = 0;
+        for (i, char) in self.line2.chars().enumerate() {
+            if i < end_current_part {
+                continue;
+            } else if char.is_digit(10) {
+                for dir in DIRECTIONS {
+                    if ((dir.0 + i as i64) > 0) && (dir.0 + i as i64) < self.line2.len() as i64 {
+                        if dir.1 == -1 {
+                            if SYMBOLS.contains(
+                                self.line1
+                                    .get((dir.0 as usize + i)..=(dir.0 as usize + i))
+                                    .unwrap(),
+                            ) {
+                                (part, end_current_part) = self.extract_part(i);
+                                parts.push(part);
+                            }
+                        } else if dir.1 == 0 {
+                            if SYMBOLS.contains(
+                                self.line2
+                                    .get((dir.0 as usize + i)..=(dir.0 as usize + i))
+                                    .unwrap(),
+                            ) {
+                                (part, end_current_part) = self.extract_part(i);
+                                parts.push(part);
+                            }
+                        } else if dir.1 == 1 {
+                            if SYMBOLS.contains(
+                                self.line3
+                                    .get((dir.0 as usize + i)..=(dir.0 as usize + i))
+                                    .unwrap(),
+                            ) {
+                                (part, end_current_part) = self.extract_part(i);
+                                parts.push(part);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(parts)
+    }
 
-        parts
+    fn extract_part(&self, idx: usize) -> (u64, usize) {
+        (0, 0)
     }
 }
 fn solution_a(file: File) -> Result<u64> {
@@ -66,7 +119,7 @@ fn solution_a(file: File) -> Result<u64> {
     let mut context: Context = Context::from_str(&line);
     while reader.read_line(&mut line)? != 0 {
         context.update_context(&line);
-        let parts = context.find_parts();
+        let parts = context.find_parts()?;
         for part in parts {
             result += part;
         }
