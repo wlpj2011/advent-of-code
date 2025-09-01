@@ -66,38 +66,44 @@ impl Context {
         let mut parts = Vec::new();
         let mut part = 0;
         let mut end_current_part: usize = 0;
-        for (i, char) in self.line2.chars().enumerate() {
-            if i < end_current_part {
-                continue;
-            } else if char.is_digit(10) {
-                for dir in DIRECTIONS {
-                    if ((dir.0 + i as i64) > 0) && (dir.0 + i as i64) < self.line2.len() as i64 {
-                        if dir.1 == -1 {
-                            if SYMBOLS.contains(
-                                self.line1
-                                    .get((dir.0 as usize + i)..=(dir.0 as usize + i))
-                                    .unwrap(),
-                            ) {
-                                (part, end_current_part) = self.extract_part(i);
-                                parts.push(part);
-                            }
-                        } else if dir.1 == 0 {
-                            if SYMBOLS.contains(
-                                self.line2
-                                    .get((dir.0 as usize + i)..=(dir.0 as usize + i))
-                                    .unwrap(),
-                            ) {
-                                (part, end_current_part) = self.extract_part(i);
-                                parts.push(part);
-                            }
-                        } else if dir.1 == 1 {
-                            if SYMBOLS.contains(
-                                self.line3
-                                    .get((dir.0 as usize + i)..=(dir.0 as usize + i))
-                                    .unwrap(),
-                            ) {
-                                (part, end_current_part) = self.extract_part(i);
-                                parts.push(part);
+        if !self.line2.is_empty() {
+            for (i, char) in self.line2.chars().enumerate() {
+                if i < end_current_part {
+                    continue;
+                } else if char.is_digit(10) {
+                    for dir in DIRECTIONS {
+                        if ((dir.0 + i as i64) > 0) && (dir.0 + i as i64) < self.line2.len() as i64
+                        {
+                            if dir.1 == -1 {
+                                if !self.line1.is_empty(){
+                                    if SYMBOLS.contains(
+                                        self.line1
+                                            .get(((dir.0 + i as i64) as usize)..=((dir.0 + i as i64) as usize))
+                                            .unwrap(),
+                                    ) {
+                                        (part, end_current_part) = self.extract_part(i);
+                                        parts.push(part);
+                                    }
+                                }
+                                
+                            } else if dir.1 == 0 {
+                                if SYMBOLS.contains(
+                                    self.line2
+                                        .get(((dir.0 + i as i64) as usize)..=((dir.0 + i as i64) as usize))
+                                        .unwrap(),
+                                ) {
+                                    (part, end_current_part) = self.extract_part(i);
+                                    parts.push(part);
+                                }
+                            } else if dir.1 == 1 {
+                                if SYMBOLS.contains(
+                                    self.line3
+                                        .get(((dir.0 + i as i64) as usize)..=((dir.0 + i as i64) as usize))
+                                        .unwrap(),
+                                ) {
+                                    (part, end_current_part) = self.extract_part(i);
+                                    parts.push(part);
+                                }
                             }
                         }
                     }
@@ -108,6 +114,7 @@ impl Context {
     }
 
     fn extract_part(&self, idx: usize) -> (u64, usize) {
+        dbg!("found part at {idx}");
         (0, 0)
     }
 }
@@ -123,7 +130,6 @@ fn solution_a(file: File) -> Result<u64> {
         for part in parts {
             result += part;
         }
-        dbg!(&context);
         line.clear();
     }
     Ok(result)
