@@ -12,7 +12,7 @@ wlpj2011's advent of code solutions. Starting with 2024, but will probably add o
 * 2021
 * 2022
 * 2023 
-  * Rust - 2/50
+  * Rust - 5/50
 * 2024 
   * Python - 11/50
 * 2025 - Forthcoming

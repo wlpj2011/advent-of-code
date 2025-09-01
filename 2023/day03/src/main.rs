@@ -64,7 +64,8 @@ impl Context {
 
     fn find_parts(&self) -> Result<Vec<u64>> {
         let mut parts = Vec::new();
-        let mut part = 0;
+        let mut part;
+        let mut _start_current_part: usize = 0;
         let mut end_current_part: usize = 0;
         if !self.line2.is_empty() {
             for (i, char) in self.line2.chars().enumerate() {
@@ -104,7 +105,7 @@ impl Context {
                                             .unwrap(),
                                     )))
                         {
-                            (part, end_current_part) = self.extract_part(i)?;
+                            (part, _start_current_part, end_current_part) = self.extract_part(i)?;
                             parts.push(part);
                         }
                     }
@@ -114,25 +115,44 @@ impl Context {
         Ok(parts)
     }
 
-    fn extract_part(&self, idx: usize) -> Result<(u64, usize)> {
-        // Returns the part number and the index of the final character of the part number
+    fn extract_part(&self, idx: usize) -> Result<(u64, usize, usize)> {
+        // Returns the part number and the index of the first and final character of the part number
         let mut found_part = false;
+        let mut in_num = false;
         let mut part_str = "".to_string();
+        let mut start = 0;
         let mut end = 0;
         for (i, char) in self.line2.chars().enumerate() {
             if i == idx {
                 found_part = true;
             }
             if char.is_ascii_digit() {
+                if !in_num {
+                    in_num = true;
+                    start = idx;
+                }
                 part_str.push(char);
             } else if found_part {
                 end = i;
                 break;
             } else {
+                in_num = false;
                 part_str.clear();
             }
         }
-        Ok((part_str.parse()?, end))
+        Ok((part_str.parse()?, start, end))
+    }
+
+    fn find_gear_ratios(&self) -> Result<Vec<u64>> {
+        let gear_ratios: Vec<_> = Vec::new();
+        if !self.line2.is_empty() {
+            for (i, char) in self.line2.chars().enumerate() {
+                if char == '*' {
+                    
+                }
+            }
+        }
+        Ok(gear_ratios)
     }
 }
 fn solution_a(file: File) -> Result<u64> {
@@ -162,7 +182,14 @@ fn solution_b(file: File) -> Result<u64> {
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
-    while reader.read_line(&mut line)? != 0 {}
+    let mut context: Context = Context::from_str(&line);
+    while reader.read_line(&mut line)? != 0 {
+        context.update_context(&line);
+        for gear_ratio in context.find_gear_ratios()? {
+            result += gear_ratio;
+        }
+        line.clear();
+    }
     Ok(result)
 }
 
@@ -172,14 +199,12 @@ fn main() -> Result<()> {
     if args.group.a {
         let file = File::open(args.file.clone())?;
         let result = solution_a(file)?;
-
         println!("The sum of the engine part numbers is {result}.");
     }
     if args.group.b {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
-
-        println!("The sum of the calibration values is {result}.");
+        println!("The sum of the gear ratios is {result}.");
     }
 
     Ok(())
@@ -193,6 +218,12 @@ mod tests {
     #[test]
     fn test_solution_a() -> Result<()> {
         assert_eq!(solution_a(File::open("test-input-03.txt")?)?, 4361);
+        Ok(())
+    }
+
+    #[test]
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-03.txt")?)?, 467835);
         Ok(())
     }
 }
