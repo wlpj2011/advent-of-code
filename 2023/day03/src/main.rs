@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use clap::builder::Str;
+//use clap::builder::Str;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
@@ -70,41 +70,42 @@ impl Context {
             for (i, char) in self.line2.chars().enumerate() {
                 if i < end_current_part {
                     continue;
-                } else if char.is_digit(10) {
+                } else if char.is_ascii_digit() {
                     for dir in DIRECTIONS {
-                        if ((dir.0 + i as i64) > 0) && (dir.0 + i as i64) < self.line2.len() as i64
-                        {
-                            if dir.1 == -1 {
-                                if !self.line1.is_empty(){
-                                    if SYMBOLS.contains(
-                                        self.line1
-                                            .get(((dir.0 + i as i64) as usize)..=((dir.0 + i as i64) as usize))
+                        if (((dir.0 + i as i64) > 0)
+                            && (dir.0 + i as i64) < self.line2.len() as i64)
+                            && ((dir.1 == -1
+                                && !self.line1.is_empty()
+                                && SYMBOLS.contains(
+                                    self.line1
+                                        .get(
+                                            ((dir.0 + i as i64) as usize)
+                                                ..=((dir.0 + i as i64) as usize),
+                                        )
+                                        .unwrap(),
+                                ))
+                                || (dir.1 == 0
+                                    && SYMBOLS.contains(
+                                        self.line2
+                                            .get(
+                                                ((dir.0 + i as i64) as usize)
+                                                    ..=((dir.0 + i as i64) as usize),
+                                            )
                                             .unwrap(),
-                                    ) {
-                                        (part, end_current_part) = self.extract_part(i);
-                                        parts.push(part);
-                                    }
-                                }
-                                
-                            } else if dir.1 == 0 {
-                                if SYMBOLS.contains(
-                                    self.line2
-                                        .get(((dir.0 + i as i64) as usize)..=((dir.0 + i as i64) as usize))
-                                        .unwrap(),
-                                ) {
-                                    (part, end_current_part) = self.extract_part(i);
-                                    parts.push(part);
-                                }
-                            } else if dir.1 == 1 {
-                                if SYMBOLS.contains(
-                                    self.line3
-                                        .get(((dir.0 + i as i64) as usize)..=((dir.0 + i as i64) as usize))
-                                        .unwrap(),
-                                ) {
-                                    (part, end_current_part) = self.extract_part(i);
-                                    parts.push(part);
-                                }
-                            }
+                                    ))
+                                || (dir.1 == 1
+                                    && !self.line3.is_empty()
+                                    && SYMBOLS.contains(
+                                        self.line3
+                                            .get(
+                                                ((dir.0 + i as i64) as usize)
+                                                    ..=((dir.0 + i as i64) as usize),
+                                            )
+                                            .unwrap(),
+                                    )))
+                        {
+                            (part, end_current_part) = self.extract_part(i)?;
+                            parts.push(part);
                         }
                     }
                 }
@@ -113,9 +114,25 @@ impl Context {
         Ok(parts)
     }
 
-    fn extract_part(&self, idx: usize) -> (u64, usize) {
-        dbg!("found part at {idx}");
-        (0, 0)
+    fn extract_part(&self, idx: usize) -> Result<(u64, usize)> {
+        // Returns the part number and the index of the final character of the part number
+        let mut found_part = false;
+        let mut part_str = "".to_string();
+        let mut end = 0;
+        for (i, char) in self.line2.chars().enumerate() {
+            if i == idx {
+                found_part = true;
+            }
+            if char.is_ascii_digit() {
+                part_str.push(char);
+            } else if found_part {
+                end = i;
+                break;
+            } else {
+                part_str.clear();
+            }
+        }
+        Ok((part_str.parse()?, end))
     }
 }
 fn solution_a(file: File) -> Result<u64> {
@@ -131,6 +148,11 @@ fn solution_a(file: File) -> Result<u64> {
             result += part;
         }
         line.clear();
+    }
+    context.update_context("");
+    let parts = context.find_parts()?;
+    for part in parts {
+        result += part;
     }
     Ok(result)
 }
