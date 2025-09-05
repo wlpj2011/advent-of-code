@@ -148,7 +148,47 @@ impl Context {
         if !self.line2.is_empty() {
             for (i, char) in self.line2.chars().enumerate() {
                 if char == '*' {
-                    
+                    let mut num_parts: u64 = 0;
+                    let mut local_parts: Vec<u64> = Vec::new();
+
+                    for dir in DIRECTIONS {
+                        // Fix this logic to check for ascii digits instead of symbols
+                        if (((dir.0 + i as i64) > 0)
+                            && (dir.0 + i as i64) < self.line2.len() as i64)
+                            && ((dir.1 == -1
+                                && !self.line1.is_empty()
+                                && SYMBOLS.contains(
+                                    self.line1
+                                        .get(
+                                            ((dir.0 + i as i64) as usize)
+                                                ..=((dir.0 + i as i64) as usize),
+                                        )
+                                        .unwrap(),
+                                ))
+                                || (dir.1 == 0
+                                    && SYMBOLS.contains(
+                                        self.line2
+                                            .get(
+                                                ((dir.0 + i as i64) as usize)
+                                                    ..=((dir.0 + i as i64) as usize),
+                                            )
+                                            .unwrap(),
+                                    ))
+                                || (dir.1 == 1
+                                    && !self.line3.is_empty()
+                                    && SYMBOLS.contains(
+                                        self.line3
+                                            .get(
+                                                ((dir.0 + i as i64) as usize)
+                                                    ..=((dir.0 + i as i64) as usize),
+                                            )
+                                            .unwrap(),
+                                    )))
+                        {
+                            // Put extraction and stuff here, this is after finding the adjacent digits to a '*'
+                            todo!();
+                        }
+                    }
                 }
             }
         }
