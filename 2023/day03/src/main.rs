@@ -65,7 +65,6 @@ impl Context {
     fn find_parts(&self) -> Result<Vec<u64>> {
         let mut parts = Vec::new();
         let mut part;
-        let mut _start_current_part: usize = 0;
         let mut end_current_part: usize = 0;
         if !self.line2.is_empty() {
             for (i, char) in self.line2.chars().enumerate() {
@@ -105,7 +104,7 @@ impl Context {
                                             .unwrap(),
                                     )))
                         {
-                            (part, _start_current_part, end_current_part) = self.extract_part(i)?;
+                            (part, _, end_current_part) = self.extract_part(2, i)?;
                             parts.push(part);
                         }
                     }
@@ -115,79 +114,130 @@ impl Context {
         Ok(parts)
     }
 
-    fn extract_part(&self, idx: usize) -> Result<(u64, usize, usize)> {
+    fn extract_part(&self, line: u64, idx: usize) -> Result<(u64, usize, usize)> {
         // Returns the part number and the index of the first and final character of the part number
         let mut found_part = false;
         let mut in_num = false;
         let mut part_str = "".to_string();
         let mut start = 0;
         let mut end = 0;
-        for (i, char) in self.line2.chars().enumerate() {
-            if i == idx {
-                found_part = true;
-            }
-            if char.is_ascii_digit() {
-                if !in_num {
-                    in_num = true;
-                    start = idx;
+        if line == 1 {
+            for (i, char) in self.line1.chars().enumerate() {
+                if i == idx {
+                    found_part = true;
                 }
-                part_str.push(char);
-            } else if found_part {
-                end = i;
-                break;
-            } else {
-                in_num = false;
-                part_str.clear();
+                if char.is_ascii_digit() {
+                    if !in_num {
+                        in_num = true;
+                        start = idx;
+                    }
+                    part_str.push(char);
+                } else if found_part {
+                    end = i;
+                    break;
+                } else {
+                    in_num = false;
+                    part_str.clear();
+                }
+            }
+        } else if line == 2 {
+            for (i, char) in self.line2.chars().enumerate() {
+                if i == idx {
+                    found_part = true;
+                }
+                if char.is_ascii_digit() {
+                    if !in_num {
+                        in_num = true;
+                        start = idx;
+                    }
+                    part_str.push(char);
+                } else if found_part {
+                    end = i;
+                    break;
+                } else {
+                    in_num = false;
+                    part_str.clear();
+                }
+            }
+        } else if line == 3 {
+            for (i, char) in self.line3.chars().enumerate() {
+                if i == idx {
+                    found_part = true;
+                }
+                if char.is_ascii_digit() {
+                    if !in_num {
+                        in_num = true;
+                        start = idx;
+                    }
+                    part_str.push(char);
+                } else if found_part {
+                    end = i;
+                    break;
+                } else {
+                    in_num = false;
+                    part_str.clear();
+                }
             }
         }
+
         Ok((part_str.parse()?, start, end))
     }
 
     fn find_gear_ratios(&self) -> Result<Vec<u64>> {
-        let gear_ratios: Vec<_> = Vec::new();
+        let mut gear_ratios: Vec<_> = Vec::new();
+
         if !self.line2.is_empty() {
             for (i, char) in self.line2.chars().enumerate() {
                 if char == '*' {
-                    let mut num_parts: u64 = 0;
                     let mut local_parts: Vec<u64> = Vec::new();
 
+                    let mut part;
                     for dir in DIRECTIONS {
                         // Fix this logic to check for ascii digits instead of symbols
                         if (((dir.0 + i as i64) > 0)
                             && (dir.0 + i as i64) < self.line2.len() as i64)
                             && ((dir.1 == -1
                                 && !self.line1.is_empty()
-                                && SYMBOLS.contains(
-                                    self.line1
+                                && self
+                                    .line1
+                                    .get(
+                                        ((dir.0 + i as i64) as usize)
+                                            ..=((dir.0 + i as i64) as usize),
+                                    )
+                                    .unwrap()
+                                    .chars()
+                                    .all(|c| c.is_ascii_digit()))
+                                || (dir.1 == 0
+                                    && self
+                                        .line2
                                         .get(
                                             ((dir.0 + i as i64) as usize)
                                                 ..=((dir.0 + i as i64) as usize),
                                         )
-                                        .unwrap(),
-                                ))
-                                || (dir.1 == 0
-                                    && SYMBOLS.contains(
-                                        self.line2
-                                            .get(
-                                                ((dir.0 + i as i64) as usize)
-                                                    ..=((dir.0 + i as i64) as usize),
-                                            )
-                                            .unwrap(),
-                                    ))
+                                        .unwrap()
+                                        .chars()
+                                        .all(|c| c.is_ascii_digit()))
                                 || (dir.1 == 1
                                     && !self.line3.is_empty()
-                                    && SYMBOLS.contains(
-                                        self.line3
-                                            .get(
-                                                ((dir.0 + i as i64) as usize)
-                                                    ..=((dir.0 + i as i64) as usize),
-                                            )
-                                            .unwrap(),
-                                    )))
+                                    && self
+                                        .line3
+                                        .get(
+                                            ((dir.0 + i as i64) as usize)
+                                                ..=((dir.0 + i as i64) as usize),
+                                        )
+                                        .unwrap()
+                                        .chars()
+                                        .all(|c| c.is_ascii_digit())))
                         {
-                            // Put extraction and stuff here, this is after finding the adjacent digits to a '*'
-                            todo!();
+                            (part, _, _) =
+                                self.extract_part((2 + dir.1) as u64, (dir.0 + i as i64) as usize)?;
+                            if !local_parts.contains(&part) {
+                                local_parts.push(part);
+                            }
                         }
+                    }
+                    if local_parts.len() == 2 {
+                        gear_ratios.push(local_parts[0] * local_parts[1]);
                     }
                 }
             }
