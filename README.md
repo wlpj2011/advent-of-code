@@ -3,7 +3,7 @@ wlpj2011's advent of code solutions. Starting with 2024, but will probably add o
 
 ## Current progress 
 * 2015 
-  * Python - 1/50
+  * Python - 1 :star:
 * 2016 
 * 2017
 * 2018
@@ -12,7 +12,7 @@ wlpj2011's advent of code solutions. Starting with 2024, but will probably add o
 * 2021
 * 2022
 * 2023 
-  * Rust - 6/50
+  * Rust - 7 :star:
 * 2024 
-  * Python - 11/50
+  * Python - 11 :star:
 * 2025 - Forthcoming
