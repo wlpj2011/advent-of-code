@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use core::num;
+//use core::num;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
@@ -19,39 +19,43 @@ struct Args {
 #[derive(Parser, Debug)]
 #[group(required = true)]
 struct Group {
-      /// Run solution to part a of day 4.
-      #[arg(short)]
-      a: bool,
-  
-      /// Run solution to part b of day 4.
-      #[arg(short)]
-      b: bool,
+    /// Run solution to part a of day 4.
+    #[arg(short)]
+    a: bool,
+
+    /// Run solution to part b of day 4.
+    #[arg(short)]
+    b: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Card {
-    _card_number: u64,
+    card_number: u64,
     winning_numbers: Vec<u64>,
     card_numbers: Vec<u64>,
 }
 
 impl Card {
     fn from_str(line: String) -> Result<Card> {
-        let mut new_card: Card  = Card{_card_number: 0, winning_numbers: Vec::new(), card_numbers: Vec::new() };
-        let line_parts : Vec<_> = line.split(':').collect();
+        let mut new_card: Card = Card {
+            card_number: 0,
+            winning_numbers: Vec::new(),
+            card_numbers: Vec::new(),
+        };
+        let line_parts: Vec<_> = line.split(':').collect();
         let card_num = line_parts[0].split(' ').collect::<Vec<_>>().pop().unwrap();
-        new_card._card_number = card_num.parse::<u64>()?;
+        new_card.card_number = card_num.parse::<u64>()?;
         let line_parts: Vec<_> = line_parts[1].split("|").collect();
         for num in line_parts[0].split_whitespace() {
             if num.is_empty() {
-                continue
+                continue;
             } else {
                 new_card.winning_numbers.push(num.parse()?);
             }
         }
         for num in line_parts[1].split_whitespace() {
             if num.is_empty() {
-                continue
+                continue;
             } else {
                 new_card.card_numbers.push(num.parse()?);
             }
@@ -60,17 +64,22 @@ impl Card {
     }
 
     fn score(self) -> u64 {
+        let num_matches = self.num_matches();
+        if num_matches == 0 {
+            0
+        } else {
+            1 << (num_matches - 1)
+        }
+    }
+
+    fn num_matches(self) -> u64 {
         let mut num_matches: u64 = 0;
-        for num in self.card_numbers {
+        for num in self.card_numbers.clone() {
             if self.winning_numbers.contains(&num) {
                 num_matches += 1;
             }
         }
-        if num_matches == 0 {
-            0
-        } else {
-            return 1 << (num_matches - 1);
-        }
+        num_matches
     }
 }
 
@@ -88,12 +97,28 @@ fn solution_a(file: File) -> Result<u64> {
 
 fn solution_b(file: File) -> Result<u64> {
     let mut result: u64 = 0;
-
+    let mut cards: Vec<Card> = Vec::new();
     let mut reader = BufReader::new(file);
     let mut line = String::new();
     while reader.read_line(&mut line)? != 0 {
-        
+        cards.push(Card::from_str(line.clone())?);
+        line.clear();
     }
+
+    let mut num_cards = vec![1u64; cards.len()];
+
+    for card in cards {
+        let num_matches = card.clone().num_matches();
+        for j in 1..=num_matches {
+            num_cards[(j + card.card_number - 1) as usize] +=
+                num_cards[(card.card_number - 1) as usize];
+        }
+    }
+
+    for num in num_cards {
+        result += num;
+    }
+
     Ok(result)
 }
 
@@ -103,16 +128,15 @@ fn main() -> Result<()> {
     if args.group.a {
         let file = File::open(args.file.clone())?;
         let result = solution_a(file)?;
-    
+
         println!("The scratchcards are worth {result} points.");
     }
     if args.group.b {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
-    
-        println!("The sum of the calibration values is {result}.");
+
+        println!("You end up with {result} scratchcards.");
     }
-    
 
     Ok(())
 }
@@ -128,5 +152,9 @@ mod tests {
         Ok(())
     }
 
-    
+    #[test]
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-04.txt")?)?, 30);
+        Ok(())
+    }
 }
