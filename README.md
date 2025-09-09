@@ -1,5 +1,5 @@
 # advent-of-code
-wlpj2011's advent of code solutions. Starting with 2024, but will probably add others very very slowly. Starting off with Python and trying out mypy for the first time.
+wlpj2011's advent of code solutions. Starting with 2024, but will probably add others very very slowly. Starting off with Python and trying out mypy for the first time. Adding 2023 in Rust now to practice the basics of Rust that I have learned.
 
 ## Current progress 
 * 2015 
