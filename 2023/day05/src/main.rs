@@ -3,6 +3,7 @@ use clap::Parser;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
+use std::ops::Add;
 
 /// Program to solve Day 5 of 2023 Advent of Code
 #[derive(Parser, Debug)]
@@ -35,6 +36,14 @@ struct Seed {
 impl Seed {
     fn new_seed(val: u64) -> Seed {
         Seed { val }
+    }
+}
+
+impl Add<u64> for Seed {
+    type Output = Seed;
+
+    fn add(self, other: u64) -> Self::Output {
+        Seed{val: self.val + other}
     }
 }
 
