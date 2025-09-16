@@ -27,7 +27,7 @@ struct Group {
     b: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Seed {
     val: u64,
 }
@@ -38,7 +38,7 @@ impl Seed {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Soil {
     val: u64,
 }
@@ -49,7 +49,7 @@ impl Soil {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Fertilizer {
     val: u64,
 }
@@ -60,7 +60,7 @@ impl Fertilizer {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Water {
     val: u64,
 }
@@ -71,7 +71,7 @@ impl Water {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Light {
     val: u64,
 }
@@ -82,7 +82,7 @@ impl Light {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Temperature {
     val: u64,
 }
@@ -93,7 +93,7 @@ impl Temperature {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Humidity {
     val: u64,
 }
@@ -104,7 +104,7 @@ impl Humidity {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Location {
     val: u64,
 }
@@ -115,6 +115,23 @@ impl Location {
     }
 }
 
+#[derive(Debug, Clone)]
+struct Almanac {
+    seeds_to_plant: Vec<Seed>,
+    map_seed_to_soil: Vec<(Seed, Soil, u64)>,
+    map_soil_to_fertilizer: Vec<(Soil, Fertilizer, u64)>,
+    map_fertilizer_to_water: Vec<(Fertilizer, Water, u64)>,
+    map_water_to_light: Vec<(Water, Light, u64)>,
+    map_light_to_temperature: Vec<(Light, Temperature, u64)>,
+    map_temperature_to_humidity: Vec<(Temperature, Humidity, u64)>,
+    map_humidity_to_location: Vec<(Humidity, Location, u64)>,
+}
+
+impl Almanac {
+    fn from_str(input: &str) -> Result<Almanac> {
+        todo!()
+    }
+}
 
 
 fn solution_a(file: File) -> Result<u64> {
