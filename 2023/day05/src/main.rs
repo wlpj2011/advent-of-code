@@ -161,7 +161,7 @@ impl Almanac {
                     for part in parts {
                         result_almanac
                             .seeds_to_plant
-                            .push(Seed { val: part.parse()? });
+                            .push(Seed { val: part.trim().parse()? });
                     }
                 }
             }
