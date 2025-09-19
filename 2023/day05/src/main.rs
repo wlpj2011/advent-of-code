@@ -43,7 +43,9 @@ impl Add<u64> for Seed {
     type Output = Seed;
 
     fn add(self, other: u64) -> Self::Output {
-        Seed{val: self.val + other}
+        Seed {
+            val: self.val + other,
+        }
     }
 }
 
@@ -137,18 +139,43 @@ struct Almanac {
 }
 
 impl Almanac {
-    fn from_str(input: &str) -> Result<Almanac> {
-        todo!()
+    fn from_file(file: File) -> Result<Almanac> {
+        let mut result_almanac = Almanac {
+            seeds_to_plant: Vec::new(),
+            map_seed_to_soil: Vec::new(),
+            map_soil_to_fertilizer: Vec::new(),
+            map_fertilizer_to_water: Vec::new(),
+            map_water_to_light: Vec::new(),
+            map_light_to_temperature: Vec::new(),
+            map_temperature_to_humidity: Vec::new(),
+            map_humidity_to_location: Vec::new(),
+        };
+
+        let mut reader = BufReader::new(file);
+        let mut line = String::new();
+        while reader.read_line(&mut line)? != 0 {
+            if line.contains(":") {
+                if line.starts_with("seeds") {
+                    line = line.get(7..).unwrap().to_string();
+                    let parts: Vec<_> = line.split(" ").collect();
+                    for part in parts {
+                        result_almanac
+                            .seeds_to_plant
+                            .push(Seed { val: part.parse()? });
+                    }
+                }
+            }
+            line.clear();
+        }
+        Ok(result_almanac)
     }
 }
-
 
 fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
-    let mut reader = BufReader::new(file);
-    let mut line = String::new();
-    while reader.read_line(&mut line)? != 0 {}
+    let almanac = Almanac::from_file(file)?;
+
     Ok(result)
 }
 
