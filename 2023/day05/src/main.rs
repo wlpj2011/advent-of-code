@@ -39,15 +39,9 @@ enum GardenType {
     Location,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Seed {
     val: u64,
-}
-
-impl Seed {
-    fn new_seed(val: u64) -> Seed {
-        Seed { val }
-    }
 }
 
 impl Add<u64> for Seed {
@@ -60,80 +54,108 @@ impl Add<u64> for Seed {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Soil {
     val: u64,
 }
 
-impl Soil {
-    fn new_soil(val: u64) -> Soil {
-        Soil { val }
+impl Add<u64> for Soil {
+    type Output = Soil;
+
+    fn add(self, other: u64) -> Self::Output {
+        Soil {
+            val: self.val + other,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Fertilizer {
     val: u64,
 }
 
-impl Fertilizer {
-    fn new_fertilizer(val: u64) -> Fertilizer {
-        Fertilizer { val }
+impl Add<u64> for Fertilizer {
+    type Output = Fertilizer;
+
+    fn add(self, other: u64) -> Self::Output {
+        Fertilizer {
+            val: self.val + other,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Water {
     val: u64,
 }
 
-impl Water {
-    fn new_water(val: u64) -> Water {
-        Water { val }
+impl Add<u64> for Water {
+    type Output = Water;
+
+    fn add(self, other: u64) -> Self::Output {
+        Water {
+            val: self.val + other,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Light {
     val: u64,
 }
 
-impl Light {
-    fn new_light(val: u64) -> Light {
-        Light { val }
+impl Add<u64> for Light {
+    type Output = Light;
+
+    fn add(self, other: u64) -> Self::Output {
+        Light {
+            val: self.val + other,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Temperature {
     val: u64,
 }
 
-impl Temperature {
-    fn new_temperature(val: u64) -> Temperature {
-        Temperature { val }
+impl Add<u64> for Temperature {
+    type Output = Temperature;
+
+    fn add(self, other: u64) -> Self::Output {
+        Temperature {
+            val: self.val + other,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Humidity {
     val: u64,
 }
 
-impl Humidity {
-    fn new_humidity(val: u64) -> Humidity {
-        Humidity { val }
+impl Add<u64> for Humidity {
+    type Output = Humidity;
+
+    fn add(self, other: u64) -> Self::Output {
+        Humidity {
+            val: self.val + other,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 struct Location {
     val: u64,
 }
 
-impl Location {
-    fn new_location(val: u64) -> Location {
-        Location { val }
+impl Add<u64> for Location {
+    type Output = Location;
+
+    fn add(self, other: u64) -> Self::Output {
+        Location {
+            val: self.val + other,
+        }
     }
 }
 
@@ -291,7 +313,7 @@ fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
     let almanac = Almanac::from_file(file)?;
-    dbg!(&almanac);
+
     Ok(result)
 }
 
