@@ -162,13 +162,13 @@ impl Add<u64> for Location {
 #[derive(Debug, Clone)]
 struct Almanac {
     seeds_to_plant: Vec<Seed>,
-    map_seed_to_soil: Vec<(Seed, Soil, u64)>,
-    map_soil_to_fertilizer: Vec<(Soil, Fertilizer, u64)>,
-    map_fertilizer_to_water: Vec<(Fertilizer, Water, u64)>,
-    map_water_to_light: Vec<(Water, Light, u64)>,
-    map_light_to_temperature: Vec<(Light, Temperature, u64)>,
-    map_temperature_to_humidity: Vec<(Temperature, Humidity, u64)>,
-    map_humidity_to_location: Vec<(Humidity, Location, u64)>,
+    map_seed_to_soil: Vec<(Soil, Seed, u64)>,
+    map_soil_to_fertilizer: Vec<(Fertilizer, Soil, u64)>,
+    map_fertilizer_to_water: Vec<(Water, Fertilizer, u64)>,
+    map_water_to_light: Vec<(Light, Water, u64)>,
+    map_light_to_temperature: Vec<(Temperature, Light, u64)>,
+    map_temperature_to_humidity: Vec<(Humidity, Temperature, u64)>,
+    map_humidity_to_location: Vec<(Location, Humidity, u64)>,
 }
 
 impl Almanac {
@@ -223,10 +223,10 @@ impl Almanac {
                 match current_type {
                     GardenType::Soil => {
                         result_almanac.map_seed_to_soil.push((
-                            Seed {
+                            Soil {
                                 val: parts[0].parse()?,
                             },
-                            Soil {
+                            Seed {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -234,10 +234,10 @@ impl Almanac {
                     }
                     GardenType::Fertilizer => {
                         result_almanac.map_soil_to_fertilizer.push((
-                            Soil {
+                            Fertilizer {
                                 val: parts[0].parse()?,
                             },
-                            Fertilizer {
+                            Soil {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -245,10 +245,10 @@ impl Almanac {
                     }
                     GardenType::Water => {
                         result_almanac.map_fertilizer_to_water.push((
-                            Fertilizer {
+                            Water {
                                 val: parts[0].parse()?,
                             },
-                            Water {
+                            Fertilizer {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -256,10 +256,10 @@ impl Almanac {
                     }
                     GardenType::Light => {
                         result_almanac.map_water_to_light.push((
-                            Water {
+                            Light {
                                 val: parts[0].parse()?,
                             },
-                            Light {
+                            Water {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -267,10 +267,10 @@ impl Almanac {
                     }
                     GardenType::Temperature => {
                         result_almanac.map_light_to_temperature.push((
-                            Light {
+                            Temperature {
                                 val: parts[0].parse()?,
                             },
-                            Temperature {
+                            Light {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -278,10 +278,10 @@ impl Almanac {
                     }
                     GardenType::Humidity => {
                         result_almanac.map_temperature_to_humidity.push((
-                            Temperature {
+                            Humidity {
                                 val: parts[0].parse()?,
                             },
-                            Humidity {
+                            Temperature {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -289,10 +289,10 @@ impl Almanac {
                     }
                     GardenType::Location => {
                         result_almanac.map_humidity_to_location.push((
-                            Humidity {
+                            Location {
                                 val: parts[0].parse()?,
                             },
-                            Location {
+                            Humidity {
                                 val: parts[1].parse()?,
                             },
                             parts[2].trim().parse()?,
@@ -306,6 +306,10 @@ impl Almanac {
         }
 
         Ok(result_almanac)
+    }
+
+    fn get_location(seed: Seed) -> Location {
+        todo!()
     }
 }
 
