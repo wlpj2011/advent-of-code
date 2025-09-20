@@ -28,6 +28,17 @@ struct Group {
     b: bool,
 }
 
+enum GardenType {
+    Seed,
+    Soil,
+    Fertilizer,
+    Water,
+    Light,
+    Temperature,
+    Humidity,
+    Location,
+}
+
 #[derive(Debug, Clone, Copy)]
 struct Seed {
     val: u64,
@@ -153,20 +164,125 @@ impl Almanac {
 
         let mut reader = BufReader::new(file);
         let mut line = String::new();
+
+        let mut current_type = GardenType::Seed;
+
         while reader.read_line(&mut line)? != 0 {
             if line.contains(":") {
                 if line.starts_with("seeds") {
                     line = line.get(7..).unwrap().to_string();
                     let parts: Vec<_> = line.split(" ").collect();
                     for part in parts {
-                        result_almanac
-                            .seeds_to_plant
-                            .push(Seed { val: part.trim().parse()? });
+                        result_almanac.seeds_to_plant.push(Seed {
+                            val: part.trim().parse()?,
+                        });
                     }
+                } else if line.starts_with("seed-") {
+                    current_type = GardenType::Soil;
+                } else if line.starts_with("soil-") {
+                    current_type = GardenType::Fertilizer;
+                } else if line.starts_with("fertilizer-") {
+                    current_type = GardenType::Water;
+                } else if line.starts_with("water-") {
+                    current_type = GardenType::Light;
+                } else if line.starts_with("light-") {
+                    current_type = GardenType::Temperature;
+                } else if line.starts_with("temperature-") {
+                    current_type = GardenType::Humidity;
+                } else if line.starts_with("humidity-") {
+                    current_type = GardenType::Location;
+                }
+            } else {
+                let parts: Vec<_> = line.split(" ").collect();
+                if parts.len() == 1 {
+                    line.clear();
+                    continue;
+                }
+                match current_type {
+                    GardenType::Soil => {
+                        result_almanac.map_seed_to_soil.push((
+                            Seed {
+                                val: parts[0].parse()?,
+                            },
+                            Soil {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    GardenType::Fertilizer => {
+                        result_almanac.map_soil_to_fertilizer.push((
+                            Soil {
+                                val: parts[0].parse()?,
+                            },
+                            Fertilizer {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    GardenType::Water => {
+                        result_almanac.map_fertilizer_to_water.push((
+                            Fertilizer {
+                                val: parts[0].parse()?,
+                            },
+                            Water {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    GardenType::Light => {
+                        result_almanac.map_water_to_light.push((
+                            Water {
+                                val: parts[0].parse()?,
+                            },
+                            Light {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    GardenType::Temperature => {
+                        result_almanac.map_light_to_temperature.push((
+                            Light {
+                                val: parts[0].parse()?,
+                            },
+                            Temperature {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    GardenType::Humidity => {
+                        result_almanac.map_temperature_to_humidity.push((
+                            Temperature {
+                                val: parts[0].parse()?,
+                            },
+                            Humidity {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    GardenType::Location => {
+                        result_almanac.map_humidity_to_location.push((
+                            Humidity {
+                                val: parts[0].parse()?,
+                            },
+                            Location {
+                                val: parts[1].parse()?,
+                            },
+                            parts[2].trim().parse()?,
+                        ));
+                    }
+                    _ => line.clear(),
                 }
             }
+
             line.clear();
         }
+
         Ok(result_almanac)
     }
 }
@@ -175,7 +291,7 @@ fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
     let almanac = Almanac::from_file(file)?;
-
+    dbg!(&almanac);
     Ok(result)
 }
 
