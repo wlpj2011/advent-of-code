@@ -401,12 +401,20 @@ fn solution_a(file: File) -> Result<u64> {
 }
 
 fn solution_b(file: File) -> Result<u64> {
-    let mut result: u64 = 0;
+    let almanac = Almanac::from_file(file)?;
+    let seeds = almanac.seeds_to_plant.clone();
+    let mut result: Seed = seeds[0];
+    let mut min_location: Location = almanac.get_location(seeds[0]);
 
-    let mut reader = BufReader::new(file);
-    let mut line = String::new();
-    while reader.read_line(&mut line)? != 0 {}
-    Ok(result)
+    for seed in seeds {
+        let seed_location = almanac.get_location(seed);
+        if seed_location < min_location {
+            min_location = seed_location;
+            result = seed;
+        }
+    }
+
+    Ok(min_location.val)
 }
 
 fn main() -> Result<()> {
@@ -436,6 +444,12 @@ mod tests {
     #[test]
     fn test_solution_a() -> Result<()> {
         assert_eq!(solution_a(File::open("test-input-05.txt")?)?, 35);
+        Ok(())
+    }
+
+    #[test]
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-05.txt")?)?, 46);
         Ok(())
     }
 }
