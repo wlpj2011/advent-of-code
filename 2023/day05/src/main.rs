@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::ops::Add;
+use tqdm::tqdm;
 
 /// Program to solve Day 5 of 2023 Advent of Code
 #[derive(Parser, Debug)]
@@ -312,7 +313,7 @@ impl Almanac {
         let old_seeds = self.seeds_to_plant.clone();
         self.seeds_to_plant = Vec::new();
 
-        for pair in old_seeds.windows(2).step_by(2) {
+        for pair in tqdm(old_seeds.windows(2).step_by(2)) {
             for i in 0..pair[1].val {
                 self.seeds_to_plant.push(pair[0] + i);
             }
@@ -400,7 +401,7 @@ fn solution_a(file: File) -> Result<u64> {
     let seeds = almanac.seeds_to_plant.clone();
     let mut min_location: Location = almanac.get_location(seeds[0]);
 
-    for seed in seeds {
+    for seed in tqdm(seeds) {
         let seed_location = almanac.get_location(seed);
         if seed_location < min_location {
             min_location = seed_location;
@@ -416,7 +417,7 @@ fn solution_b(file: File) -> Result<u64> {
     let seeds = almanac.seeds_to_plant.clone();
     let mut min_location: Location = almanac.get_location(seeds[0]);
 
-    for seed in seeds {
+    for seed in tqdm(seeds) {
         let seed_location = almanac.get_location(seed);
         if seed_location < min_location {
             min_location = seed_location;
