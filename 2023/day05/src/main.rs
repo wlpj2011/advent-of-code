@@ -308,17 +308,96 @@ impl Almanac {
         Ok(result_almanac)
     }
 
-    fn get_location(seed: Seed) -> Location {
-        todo!()
+    fn get_location(&self, seed: Seed) -> Location {
+        let mut seed_soil: Soil = Soil { val: seed.val };
+
+        for (list_soil, list_seed, range) in self.map_seed_to_soil.clone() {
+            if (seed >= list_seed) && (seed <= list_seed + (range - 1)) {
+                seed_soil = list_soil + (seed.val - list_seed.val);
+                break;
+            }
+        }
+
+        let mut seed_fertilizer: Fertilizer = Fertilizer { val: seed_soil.val };
+        for (list_fertilizer, list_soil, range) in self.map_soil_to_fertilizer.clone() {
+            if (seed_soil >= list_soil) && (seed_soil <= list_soil + (range - 1)) {
+                seed_fertilizer = list_fertilizer + (seed_soil.val - list_soil.val);
+                break;
+            }
+        }
+
+        let mut seed_water: Water = Water {
+            val: seed_fertilizer.val,
+        };
+        for (list_water, list_fertilizer, range) in self.map_fertilizer_to_water.clone() {
+            if (seed_fertilizer >= list_fertilizer)
+                && (seed_fertilizer <= list_fertilizer + (range - 1))
+            {
+                seed_water = list_water + (seed_fertilizer.val - list_fertilizer.val);
+                break;
+            }
+        }
+
+        let mut seed_light: Light = Light {
+            val: seed_water.val,
+        };
+        for (list_light, list_water, range) in self.map_water_to_light.clone() {
+            if (seed_water >= list_water) && (seed_water <= list_water + (range - 1)) {
+                seed_light = list_light + (seed_water.val - list_water.val);
+                break;
+            }
+        }
+
+        let mut seed_temperature: Temperature = Temperature {
+            val: seed_light.val,
+        };
+        for (list_temperature, list_light, range) in self.map_light_to_temperature.clone() {
+            if (seed_light >= list_light) && (seed_light <= list_light + (range - 1)) {
+                seed_temperature = list_temperature + (seed_light.val - list_light.val);
+                break;
+            }
+        }
+
+        let mut seed_humidity: Humidity = Humidity {
+            val: seed_temperature.val,
+        };
+        for (list_humidity, list_temperature, range) in self.map_temperature_to_humidity.clone() {
+            if (seed_temperature >= list_temperature)
+                && (seed_temperature <= list_temperature + (range - 1))
+            {
+                seed_humidity = list_humidity + (seed_temperature.val - list_temperature.val);
+                break;
+            }
+        }
+
+        let mut seed_location: Location = Location {
+            val: seed_humidity.val,
+        };
+        for (list_location, list_humidity, range) in self.map_humidity_to_location.clone() {
+            if (seed_humidity >= list_humidity) && (seed_humidity <= list_humidity + (range - 1)) {
+                seed_location = list_location + (seed_humidity.val - list_humidity.val);
+                break;
+            }
+        }
+        seed_location
     }
 }
 
 fn solution_a(file: File) -> Result<u64> {
-    let mut result: u64 = 0;
-
     let almanac = Almanac::from_file(file)?;
+    let seeds = almanac.seeds_to_plant.clone();
+    let mut result: Seed = seeds[0];
+    let mut min_location: Location = almanac.get_location(seeds[0]);
 
-    Ok(result)
+    for seed in seeds {
+        let seed_location = almanac.get_location(seed);
+        if seed_location < min_location {
+            min_location = seed_location;
+            result = seed;
+        }
+    }
+
+    Ok(min_location.val)
 }
 
 fn solution_b(file: File) -> Result<u64> {
