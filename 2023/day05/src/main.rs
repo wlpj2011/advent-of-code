@@ -308,6 +308,18 @@ impl Almanac {
         Ok(result_almanac)
     }
 
+    fn convert_seeds_from_list(&mut self) {
+        let old_seeds = self.seeds_to_plant.clone();
+        self.seeds_to_plant = Vec::new();
+
+        for pair in old_seeds.windows(2).step_by(2) {
+            for i in 0..pair[1].val {
+                self.seeds_to_plant.push(pair[0] + i);
+            }
+        }
+
+    }
+
     fn get_location(&self, seed: Seed) -> Location {
         let mut seed_soil: Soil = Soil { val: seed.val };
 
@@ -386,14 +398,12 @@ impl Almanac {
 fn solution_a(file: File) -> Result<u64> {
     let almanac = Almanac::from_file(file)?;
     let seeds = almanac.seeds_to_plant.clone();
-    let mut result: Seed = seeds[0];
     let mut min_location: Location = almanac.get_location(seeds[0]);
 
     for seed in seeds {
         let seed_location = almanac.get_location(seed);
         if seed_location < min_location {
             min_location = seed_location;
-            result = seed;
         }
     }
 
@@ -401,16 +411,15 @@ fn solution_a(file: File) -> Result<u64> {
 }
 
 fn solution_b(file: File) -> Result<u64> {
-    let almanac = Almanac::from_file(file)?;
+    let mut almanac = Almanac::from_file(file)?;
+    almanac.convert_seeds_from_list();
     let seeds = almanac.seeds_to_plant.clone();
-    let mut result: Seed = seeds[0];
     let mut min_location: Location = almanac.get_location(seeds[0]);
 
     for seed in seeds {
         let seed_location = almanac.get_location(seed);
         if seed_location < min_location {
             min_location = seed_location;
-            result = seed;
         }
     }
 
@@ -430,7 +439,7 @@ fn main() -> Result<()> {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
 
-        println!("The sum of the calibration values is {result}.");
+        println!("The lowest location value for a seed is {result}.");
     }
 
     Ok(())
