@@ -26,15 +26,32 @@ struct Group {
       #[arg(short)]
       b: bool,
 }
+#[derive(Debug, Clone, Copy)]
+struct Race {
+    time: u64,
+    distance: u64,
+}
 
+impl Race {
+    fn from_time(time: u64) -> Race {
+        Race{time, distance: 0}
+    }
+
+    fn update_distance(&mut self, distance: u64) {
+        self.distance = distance;
+    }
+}
 
 fn solution_a(file: File) -> Result<u64> {
-    let mut result: u64 = 0;
+    let mut result: u64 = 1;
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
+    let mut races: Vec<Race> = Vec::new();
     while reader.read_line(&mut line)? != 0 {
         
+
+        line.clear();
     }
     Ok(result)
 }
@@ -45,7 +62,8 @@ fn solution_b(file: File) -> Result<u64> {
     let mut reader = BufReader::new(file);
     let mut line = String::new();
     while reader.read_line(&mut line)? != 0 {
-        
+
+        line.clear();
     }
     Ok(result)
 }
