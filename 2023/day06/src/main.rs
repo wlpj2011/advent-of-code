@@ -97,15 +97,42 @@ fn solution_a(file: File) -> Result<u64> {
 }
 
 fn solution_b(file: File) -> Result<u64> {
-    let mut result: u64 = 0;
-
     let mut reader = BufReader::new(file);
     let mut line = String::new();
+    let mut partial_time = String::new();
+    let mut partial_distance = String::new();
     while reader.read_line(&mut line)? != 0 {
+        if line.contains("Time") {
+            let parts: Vec<_> = line.split_ascii_whitespace().collect();
+            for part in parts {
+                if part.contains("Time") {
+                    continue;
+                } else {
+                    if !part.trim().is_empty() {
+                        partial_time.push_str(part.trim());
+                    }
+                }
+            }
+        }
+        if line.contains("Distance") {
+            let parts: Vec<_> = line.split_ascii_whitespace().collect();
+            for part in parts {
+                if part.contains("Distance") {
+                    continue;
+                } else {
+                    if !part.trim().is_empty() {
+                        partial_distance.push_str(part.trim());
+                    }
+                }
+            }
+        }
 
         line.clear();
     }
-    Ok(result)
+
+    let race = Race{time: partial_time.parse()?, distance: partial_distance.parse()?};
+
+    Ok(race.count_wins())
 }
 
 fn main() -> Result<()> {
