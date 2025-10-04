@@ -40,6 +40,16 @@ impl Race {
     fn update_distance(&mut self, distance: u64) {
         self.distance = distance;
     }
+
+    fn count_wins(self) -> u64{
+        let mut wins: u64 = 0;
+        for i in 1..self.time {
+            if i * (self.time - i) > self.distance {
+                wins += 1;
+            }
+        }
+        return wins
+    }
 }
 
 fn solution_a(file: File) -> Result<u64> {
@@ -49,10 +59,40 @@ fn solution_a(file: File) -> Result<u64> {
     let mut line = String::new();
     let mut races: Vec<Race> = Vec::new();
     while reader.read_line(&mut line)? != 0 {
-        
+        if line.contains("Time") {
+            let parts: Vec<_> = line.split_ascii_whitespace().collect();
+            for part in parts {
+                if part.contains("Time") {
+                    continue;
+                } else {
+                    if !part.trim().is_empty() {
+                        races.push(Race::from_time(part.trim().parse()?));
+                    }
+                }
+            }
+        }
+        if line.contains("Distance") {
+            let mut race_num = 0;
+            let parts: Vec<_> = line.split_ascii_whitespace().collect();
+            for part in parts {
+                if part.contains("Distance") {
+                    continue;
+                } else {
+                    if !part.trim().is_empty() {
+                        races[race_num].update_distance(part.trim().parse()?);
+                        race_num += 1
+                    }
+                }
+            }
+        }
 
         line.clear();
     }
+
+    for race in races {
+        result *= race.count_wins();
+    }
+
     Ok(result)
 }
 
@@ -96,6 +136,12 @@ mod tests {
     #[test]
     fn test_solution_a() -> Result<()> {
         assert_eq!(solution_a(File::open("test-input-06.txt")?)?, 288);
+        Ok(())
+    }
+
+    #[test]
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-06.txt")?)?, 71503);
         Ok(())
     }
 
