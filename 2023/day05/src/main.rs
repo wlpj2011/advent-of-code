@@ -318,7 +318,6 @@ impl Almanac {
                 self.seeds_to_plant.push(pair[0] + i);
             }
         }
-
     }
 
     fn get_location(&self, seed: Seed) -> Location {

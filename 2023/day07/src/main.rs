@@ -1,9 +1,9 @@
 use anyhow::Result;
 use clap::Parser;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
-use std::collections::HashMap;
 
 /// Program to solve Day 7 of 2023 Advent of Code
 #[derive(Parser, Debug)]
@@ -19,13 +19,13 @@ struct Args {
 #[derive(Parser, Debug)]
 #[group(required = true)]
 struct Group {
-      /// Run solution to part a of day 7.
-      #[arg(short)]
-      a: bool,
-  
-      /// Run solution to part b of day 7.
-      #[arg(short)]
-      b: bool,
+    /// Run solution to part a of day 7.
+    #[arg(short)]
+    a: bool,
+
+    /// Run solution to part b of day 7.
+    #[arg(short)]
+    b: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -43,7 +43,7 @@ enum Card {
     Four,
     Three,
     Two,
-    None
+    None,
 }
 
 impl Card {
@@ -82,7 +82,7 @@ impl Card {
         } else if card == '8' {
             Card::Eight
         } else if card == '7' {
-            Card::Seven 
+            Card::Seven
         } else if card == '6' {
             Card::Six
         } else if card == '5' {
@@ -91,7 +91,7 @@ impl Card {
             Card::Four
         } else if card == '3' {
             Card::Three
-        } else if card == '2'{
+        } else if card == '2' {
             Card::Two
         } else {
             Card::None
@@ -148,7 +148,7 @@ impl PartialOrd for HandType {
     }
 }
 
-#[derive(Debug,Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Hand {
     hand: [Card; 5],
     bet: u64,
@@ -164,7 +164,7 @@ impl Hand {
         for (place, card) in hand_str.chars().enumerate() {
             hand[place] = Card::from_char(card);
         }
-        
+
         let mut hand_type = HandType::HighCard;
 
         let hand_clone = hand.clone();
@@ -172,12 +172,11 @@ impl Hand {
         for item in hand_clone {
             *map.entry(item).or_insert(0) += 1;
         }
-        
-        let (cards, frequencies): (Vec<Card>, Vec<u64>) = map.iter().unzip();
+
+        let (_cards, frequencies): (Vec<Card>, Vec<u64>) = map.iter().unzip();
         if frequencies.len() == 1 {
             hand_type = HandType::FiveOfKind;
-        }
-        else if frequencies.len() == 2 {
+        } else if frequencies.len() == 2 {
             if frequencies.contains(&4) {
                 hand_type = HandType::FourOfKind;
             } else if frequencies.contains(&3) {
@@ -193,13 +192,28 @@ impl Hand {
             hand_type = HandType::OnePair
         }
 
-        Ok(Hand { hand, bet, hand_type})
+        Ok(Hand {
+            hand,
+            bet,
+            hand_type,
+        })
     }
 }
 
 impl Ord for Hand {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        todo!();
+        if self.hand_type == other.hand_type {
+            for (place, card) in self.hand.iter().enumerate() {
+                if *card == other.hand[place] {
+                    continue;
+                } else {
+                    return card.cmp(&other.hand[place]);
+                }
+            }
+            return std::cmp::Ordering::Equal;
+        } else {
+            self.hand_type.cmp(&other.hand_type)
+        }
     }
 }
 
@@ -208,9 +222,6 @@ impl PartialOrd for Hand {
         Some(self.cmp(other))
     }
 }
-
-
-
 
 fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
@@ -224,7 +235,7 @@ fn solution_a(file: File) -> Result<u64> {
     }
     hands.sort();
     for (rank, hand) in hands.iter().enumerate() {
-        result += hand.bet * (rank as u64);
+        result += hand.bet * ((rank as u64) + 1);
     }
     Ok(result)
 }
@@ -235,7 +246,6 @@ fn solution_b(file: File) -> Result<u64> {
     let mut reader = BufReader::new(file);
     let mut line = String::new();
     while reader.read_line(&mut line)? != 0 {
-        
         line.clear();
     }
 
@@ -248,16 +258,15 @@ fn main() -> Result<()> {
     if args.group.a {
         let file = File::open(args.file.clone())?;
         let result = solution_a(file)?;
-    
+
         println!("The total winnings of your hands are {result}.");
     }
     if args.group.b {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
-    
+
         println!("The total winnings of your hands are {result}.");
     }
-    
 
     Ok(())
 }
@@ -281,59 +290,103 @@ mod tests {
 
     #[test]
     fn test_hand_from_str_one_pair() -> Result<()> {
-        let hand = Hand{hand: [Card::Three, Card::Two, Card::Ten, Card::Three, Card::King], bet: 765, hand_type: HandType::OnePair};
+        let hand = Hand {
+            hand: [Card::Three, Card::Two, Card::Ten, Card::Three, Card::King],
+            bet: 765,
+            hand_type: HandType::OnePair,
+        };
         assert_eq!(Hand::from_str("32T3K 765")?, hand);
         Ok(())
     }
 
     #[test]
     fn test_hand_from_str_two_pair_1() -> Result<()> {
-        let hand = Hand{hand: [Card::King, Card::King, Card::Six, Card::Seven, Card::Seven], bet: 28, hand_type: HandType::TwoPair};
+        let hand = Hand {
+            hand: [Card::King, Card::King, Card::Six, Card::Seven, Card::Seven],
+            bet: 28,
+            hand_type: HandType::TwoPair,
+        };
         assert_eq!(Hand::from_str("KK677 28")?, hand);
         Ok(())
     }
-    
+
     #[test]
     fn test_hand_from_str_two_pair_2() -> Result<()> {
-        let hand = Hand{hand: [Card::King, Card::Ten, Card::Jack, Card::Jack, Card::Ten], bet: 220, hand_type: HandType::TwoPair};
+        let hand = Hand {
+            hand: [Card::King, Card::Ten, Card::Jack, Card::Jack, Card::Ten],
+            bet: 220,
+            hand_type: HandType::TwoPair,
+        };
         assert_eq!(Hand::from_str("KTJJT 220")?, hand);
         Ok(())
     }
 
     #[test]
     fn test_hand_from_str_three_of_kind_1() -> Result<()> {
-        let hand = Hand{hand: [Card::Ten, Card::Five, Card::Five, Card::Jack, Card::Five], bet: 684, hand_type: HandType::ThreeOfKind};
+        let hand = Hand {
+            hand: [Card::Ten, Card::Five, Card::Five, Card::Jack, Card::Five],
+            bet: 684,
+            hand_type: HandType::ThreeOfKind,
+        };
         assert_eq!(Hand::from_str("T55J5 684")?, hand);
         Ok(())
     }
 
     #[test]
     fn test_hand_from_str_three_of_kind_2() -> Result<()> {
-        let hand = Hand{hand: [Card::Queen, Card::Queen, Card::Queen, Card::Jack, Card::Ace], bet: 483, hand_type: HandType::ThreeOfKind};
+        let hand = Hand {
+            hand: [Card::Queen, Card::Queen, Card::Queen, Card::Jack, Card::Ace],
+            bet: 483,
+            hand_type: HandType::ThreeOfKind,
+        };
         assert_eq!(Hand::from_str("QQQJA 483")?, hand);
         Ok(())
     }
 
     #[test]
     fn test_hand_compare_1() -> Result<()> {
-        let hand1 = Hand{hand: [Card::Queen, Card::Queen, Card::Queen, Card::Jack, Card::Ace], bet: 483, hand_type: HandType::ThreeOfKind};
-        let hand2 = Hand{hand: [Card::Ten, Card::Five, Card::Five, Card::Jack, Card::Five], bet: 684, hand_type: HandType::ThreeOfKind};
+        let hand1 = Hand {
+            hand: [Card::Queen, Card::Queen, Card::Queen, Card::Jack, Card::Ace],
+            bet: 483,
+            hand_type: HandType::ThreeOfKind,
+        };
+        let hand2 = Hand {
+            hand: [Card::Ten, Card::Five, Card::Five, Card::Jack, Card::Five],
+            bet: 684,
+            hand_type: HandType::ThreeOfKind,
+        };
         assert!(hand1 > hand2);
         Ok(())
     }
 
     #[test]
     fn test_hand_compare_2() -> Result<()> {
-        let hand1 = Hand{hand: [Card::Queen, Card::Queen, Card::Queen, Card::Jack, Card::Ace], bet: 483, hand_type: HandType::ThreeOfKind};
-        let hand2 = Hand{hand: [Card::King, Card::Ten, Card::Jack, Card::Jack, Card::Ten], bet: 220, hand_type: HandType::TwoPair};
+        let hand1 = Hand {
+            hand: [Card::Queen, Card::Queen, Card::Queen, Card::Jack, Card::Ace],
+            bet: 483,
+            hand_type: HandType::ThreeOfKind,
+        };
+        let hand2 = Hand {
+            hand: [Card::King, Card::Ten, Card::Jack, Card::Jack, Card::Ten],
+            bet: 220,
+            hand_type: HandType::TwoPair,
+        };
         assert!(hand1 > hand2);
         Ok(())
     }
 
     #[test]
     fn test_hand_compare_3() -> Result<()> {
-        let hand1 = Hand{hand: [Card::King, Card::King, Card::Six, Card::Seven, Card::Seven], bet: 28, hand_type: HandType::TwoPair};
-        let hand2 = Hand{hand: [Card::King, Card::Ten, Card::Jack, Card::Jack, Card::Ten], bet: 220, hand_type: HandType::TwoPair};
+        let hand1 = Hand {
+            hand: [Card::King, Card::King, Card::Six, Card::Seven, Card::Seven],
+            bet: 28,
+            hand_type: HandType::TwoPair,
+        };
+        let hand2 = Hand {
+            hand: [Card::King, Card::Ten, Card::Jack, Card::Jack, Card::Ten],
+            bet: 220,
+            hand_type: HandType::TwoPair,
+        };
         assert!(hand1 > hand2);
         Ok(())
     }

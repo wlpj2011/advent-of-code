@@ -18,13 +18,13 @@ struct Args {
 #[derive(Parser, Debug)]
 #[group(required = true)]
 struct Group {
-      /// Run solution to part a of day 6.
-      #[arg(short)]
-      a: bool,
-  
-      /// Run solution to part b of day 6.
-      #[arg(short)]
-      b: bool,
+    /// Run solution to part a of day 6.
+    #[arg(short)]
+    a: bool,
+
+    /// Run solution to part b of day 6.
+    #[arg(short)]
+    b: bool,
 }
 #[derive(Debug, Clone, Copy)]
 struct Race {
@@ -34,21 +34,21 @@ struct Race {
 
 impl Race {
     fn from_time(time: u64) -> Race {
-        Race{time, distance: 0}
+        Race { time, distance: 0 }
     }
 
     fn update_distance(&mut self, distance: u64) {
         self.distance = distance;
     }
 
-    fn count_wins(self) -> u64{
+    fn count_wins(self) -> u64 {
         let mut wins: u64 = 0;
         for i in 1..self.time {
             if i * (self.time - i) > self.distance {
                 wins += 1;
             }
         }
-        return wins
+        return wins;
     }
 }
 
@@ -130,7 +130,10 @@ fn solution_b(file: File) -> Result<u64> {
         line.clear();
     }
 
-    let race = Race{time: partial_time.parse()?, distance: partial_distance.parse()?};
+    let race = Race {
+        time: partial_time.parse()?,
+        distance: partial_distance.parse()?,
+    };
 
     Ok(race.count_wins())
 }
@@ -141,16 +144,15 @@ fn main() -> Result<()> {
     if args.group.a {
         let file = File::open(args.file.clone())?;
         let result = solution_a(file)?;
-    
+
         println!("The total number of ways you can win is {result}.");
     }
     if args.group.b {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
-    
+
         println!("The total number of ways you can win is {result}.");
     }
-    
 
     Ok(())
 }
@@ -171,6 +173,4 @@ mod tests {
         assert_eq!(solution_b(File::open("test-input-06.txt")?)?, 71503);
         Ok(())
     }
-
-    
 }
