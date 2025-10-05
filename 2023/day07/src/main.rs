@@ -43,30 +43,32 @@ enum Card {
     Four,
     Three,
     Two,
+    Joker,
     None,
 }
 
 impl Card {
     fn enum_index(&self) -> u64 {
         match *self {
-            Card::Ace => 12,
-            Card::King => 11,
-            Card::Queen => 10,
-            Card::Jack => 9,
-            Card::Ten => 8,
-            Card::Nine => 7,
-            Card::Eight => 6,
-            Card::Seven => 5,
-            Card::Six => 4,
-            Card::Five => 3,
-            Card::Four => 2,
-            Card::Three => 1,
-            Card::Two => 0,
+            Card::Ace => 14,
+            Card::King => 13,
+            Card::Queen => 12,
+            Card::Jack => 11,
+            Card::Ten => 10,
+            Card::Nine => 9,
+            Card::Eight => 8,
+            Card::Seven => 7,
+            Card::Six => 6,
+            Card::Five => 5,
+            Card::Four => 4,
+            Card::Three => 3,
+            Card::Two => 2,
+            Card::Joker => 1,
             Card::None => 0,
         }
     }
 
-    fn from_char(card: char) -> Card {
+    fn from_char(card: char, allow_joker: bool) -> Card {
         if card == 'A' {
             Card::Ace
         } else if card == 'K' {
@@ -74,7 +76,7 @@ impl Card {
         } else if card == 'Q' {
             Card::Queen
         } else if card == 'J' {
-            Card::Jack
+            if allow_joker { Card::Joker } else { Card::Jack }
         } else if card == 'T' {
             Card::Ten
         } else if card == '9' {
@@ -156,13 +158,13 @@ struct Hand {
 }
 
 impl Hand {
-    fn from_str(string: &str) -> Result<Hand> {
+    fn from_str(string: &str, allow_joker: bool) -> Result<Hand> {
         let parts: Vec<_> = string.split_ascii_whitespace().collect();
         let mut hand: [Card; 5] = [Card::Two; 5];
         let hand_str = parts[0];
         let bet: u64 = parts[1].parse()?;
         for (place, card) in hand_str.chars().enumerate() {
-            hand[place] = Card::from_char(card);
+            hand[place] = Card::from_char(card, allow_joker);
         }
 
         let mut hand_type = HandType::HighCard;
@@ -230,7 +232,7 @@ fn solution_a(file: File) -> Result<u64> {
     let mut line = String::new();
     let mut hands: Vec<Hand> = Vec::new();
     while reader.read_line(&mut line)? != 0 {
-        hands.push(Hand::from_str(&line)?);
+        hands.push(Hand::from_str(&line, false)?);
         line.clear();
     }
     hands.sort();
@@ -245,10 +247,15 @@ fn solution_b(file: File) -> Result<u64> {
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
+    let mut hands: Vec<Hand> = Vec::new();
     while reader.read_line(&mut line)? != 0 {
+        hands.push(Hand::from_str(&line, true)?);
         line.clear();
     }
-
+    hands.sort();
+    for (rank, hand) in hands.iter().enumerate() {
+        result += hand.bet * ((rank as u64) + 1);
+    }
     Ok(result)
 }
 
@@ -284,7 +291,7 @@ mod tests {
 
     #[test]
     fn test_solution_b() -> Result<()> {
-        assert_eq!(solution_b(File::open("test-input-07.txt")?)?, 0);
+        assert_eq!(solution_b(File::open("test-input-07.txt")?)?, 5905);
         Ok(())
     }
 
@@ -295,7 +302,7 @@ mod tests {
             bet: 765,
             hand_type: HandType::OnePair,
         };
-        assert_eq!(Hand::from_str("32T3K 765")?, hand);
+        assert_eq!(Hand::from_str("32T3K 765", false)?, hand);
         Ok(())
     }
 
@@ -306,7 +313,7 @@ mod tests {
             bet: 28,
             hand_type: HandType::TwoPair,
         };
-        assert_eq!(Hand::from_str("KK677 28")?, hand);
+        assert_eq!(Hand::from_str("KK677 28", false)?, hand);
         Ok(())
     }
 
@@ -317,7 +324,7 @@ mod tests {
             bet: 220,
             hand_type: HandType::TwoPair,
         };
-        assert_eq!(Hand::from_str("KTJJT 220")?, hand);
+        assert_eq!(Hand::from_str("KTJJT 220", false)?, hand);
         Ok(())
     }
 
@@ -328,7 +335,7 @@ mod tests {
             bet: 684,
             hand_type: HandType::ThreeOfKind,
         };
-        assert_eq!(Hand::from_str("T55J5 684")?, hand);
+        assert_eq!(Hand::from_str("T55J5 684", false)?, hand);
         Ok(())
     }
 
@@ -339,7 +346,7 @@ mod tests {
             bet: 483,
             hand_type: HandType::ThreeOfKind,
         };
-        assert_eq!(Hand::from_str("QQQJA 483")?, hand);
+        assert_eq!(Hand::from_str("QQQJA 483", false)?, hand);
         Ok(())
     }
 
