@@ -4,6 +4,8 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 /// Program to solve Day 7 of 2023 Advent of Code
 #[derive(Parser, Debug)]
@@ -28,7 +30,7 @@ struct Group {
     b: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 enum Card {
     Ace,
     King,
@@ -99,6 +101,26 @@ impl Card {
             Card::None
         }
     }
+
+    fn to_char(self) -> char {
+        match self {
+            Card::Ace => 'A',
+            Card::King => 'K',
+            Card::Queen => 'Q',
+            Card::Jack => 'J',
+            Card::Ten => 'T',
+            Card::Nine => '9',
+            Card::Eight => '8',
+            Card::Seven => '7',
+            Card::Six => '6',
+            Card::Five => '5',
+            Card::Four => '4',
+            Card::Three => '3',
+            Card::Two => '2',
+            Card::Joker => ' ',
+            Card::None => ' ',
+        }
+    }
 }
 
 impl Ord for Card {
@@ -158,8 +180,8 @@ struct Hand {
 }
 
 impl Hand {
-    fn from_str(string: &str, allow_joker: bool) -> Result<Hand> {
-        let parts: Vec<_> = string.split_ascii_whitespace().collect();
+    fn from_str(hand_string: &str, allow_joker: bool) -> Result<Hand> {
+        let parts: Vec<_> = hand_string.split_ascii_whitespace().collect();
         let mut hand: [Card; 5] = [Card::Two; 5];
         let hand_str = parts[0];
         let bet: u64 = parts[1].parse()?;
@@ -176,22 +198,46 @@ impl Hand {
         }
 
         let (_cards, frequencies): (Vec<Card>, Vec<u64>) = map.iter().unzip();
-        if frequencies.len() == 1 {
-            hand_type = HandType::FiveOfKind;
-        } else if frequencies.len() == 2 {
-            if frequencies.contains(&4) {
-                hand_type = HandType::FourOfKind;
-            } else if frequencies.contains(&3) {
-                hand_type = HandType::FullHouse
+        if !allow_joker {
+            if frequencies.len() == 1 {
+                hand_type = HandType::FiveOfKind;
+            } else if frequencies.len() == 2 {
+                if frequencies.contains(&4) {
+                    hand_type = HandType::FourOfKind;
+                } else if frequencies.contains(&3) {
+                    hand_type = HandType::FullHouse
+                }
+            } else if frequencies.len() == 3 {
+                if frequencies.contains(&3) {
+                    hand_type = HandType::ThreeOfKind
+                } else if frequencies.contains(&2) {
+                    hand_type = HandType::TwoPair
+                }
+            } else if frequencies.len() == 4 {
+                hand_type = HandType::OnePair
             }
-        } else if frequencies.len() == 3 {
-            if frequencies.contains(&3) {
-                hand_type = HandType::ThreeOfKind
-            } else if frequencies.contains(&2) {
-                hand_type = HandType::TwoPair
+        } else {
+            let joker_index = hand_string.find("J");
+            if joker_index == None {
+                return Hand::from_str(hand_string, false);
             }
-        } else if frequencies.len() == 4 {
-            hand_type = HandType::OnePair
+            let joker_index = joker_index.unwrap();
+            let mut max_hand_type = HandType::HighCard;
+            for joker_possibility in Card::iter() {
+                if joker_possibility == Card::None || joker_possibility == Card::Joker {
+                    continue;
+                }
+                let mut new_hand = String::from(hand_string);
+                new_hand.replace_range(
+                    joker_index..joker_index + 1,
+                    &joker_possibility.to_char().to_string(),
+                );
+                let new_hand = Hand::from_str(&new_hand, false)?;
+                if new_hand.hand_type > max_hand_type {
+                    max_hand_type = new_hand.hand_type;
+                }
+            }
+            hand_type = max_hand_type;
         }
 
         Ok(Hand {
