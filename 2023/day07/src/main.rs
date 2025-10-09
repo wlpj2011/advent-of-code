@@ -232,7 +232,8 @@ impl Hand {
                     joker_index..joker_index + 1,
                     &joker_possibility.to_char().to_string(),
                 );
-                let new_hand = Hand::from_str(&new_hand, false)?;
+                let new_hand = Hand::from_str(&new_hand, true)?;
+                dbg!(&new_hand);
                 if new_hand.hand_type > max_hand_type {
                     max_hand_type = new_hand.hand_type;
                 }
@@ -393,6 +394,61 @@ mod tests {
             hand_type: HandType::ThreeOfKind,
         };
         assert_eq!(Hand::from_str("QQQJA 483", false)?, hand);
+        Ok(())
+    }
+
+    #[test]
+    fn test_hand_from_str_one_pair_joker() -> Result<()> {
+        let hand = Hand {
+            hand: [Card::Three, Card::Two, Card::Ten, Card::Three, Card::King],
+            bet: 765,
+            hand_type: HandType::OnePair,
+        };
+        assert_eq!(Hand::from_str("32T3K 765", true)?, hand);
+        Ok(())
+    }
+
+    #[test]
+    fn test_hand_from_str_two_pair_joker() -> Result<()> {
+        let hand = Hand {
+            hand: [Card::King, Card::King, Card::Six, Card::Seven, Card::Seven],
+            bet: 28,
+            hand_type: HandType::TwoPair,
+        };
+        assert_eq!(Hand::from_str("KK677 28", true)?, hand);
+        Ok(())
+    }
+
+    #[test]
+    fn test_hand_from_str_four_of_kind_joker_1() -> Result<()> {
+        let hand = Hand {
+            hand: [Card::King, Card::Ten, Card::Joker, Card::Joker, Card::Ten],
+            bet: 220,
+            hand_type: HandType::FourOfKind,
+        };
+        assert_eq!(Hand::from_str("KTJJT 220", true)?, hand);
+        Ok(())
+    }
+
+    #[test]
+    fn test_hand_from_str_four_of_kind_joker_2() -> Result<()> {
+        let hand = Hand {
+            hand: [Card::Queen, Card::Queen, Card::Queen, Card::Joker, Card::Ace],
+            bet: 483,
+            hand_type: HandType::FourOfKind,
+        };
+        assert_eq!(Hand::from_str("QQQJA 483", true)?, hand);
+        Ok(())
+    }
+
+    #[test]
+    fn test_hand_from_str_four_of_kind_joker_3() -> Result<()> {
+        let hand = Hand {
+            hand: [Card::Ten, Card::Five, Card::Five, Card::Joker, Card::Five],
+            bet: 684,
+            hand_type: HandType::FourOfKind,
+        };
+        assert_eq!(Hand::from_str("T55J5 684", true)?, hand);
         Ok(())
     }
 
