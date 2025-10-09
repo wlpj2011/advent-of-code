@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use itertools::Itertools;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
@@ -217,23 +218,31 @@ impl Hand {
                 hand_type = HandType::OnePair
             }
         } else {
-            let joker_index = hand_string.find("J");
-            if joker_index == None {
+            let mut joker_indices = Vec::new();
+            for (loc, char) in hand_string.chars().enumerate() {
+                if char == 'J' {
+                    joker_indices.push(loc);
+                }
+            }
+            if joker_indices.len() == 0 {
                 return Hand::from_str(hand_string, false);
             }
-            let joker_index = joker_index.unwrap();
             let mut max_hand_type = HandType::HighCard;
-            for joker_possibility in Card::iter() {
-                if joker_possibility == Card::None || joker_possibility == Card::Joker {
-                    continue;
-                }
+            let mut possible_cards = Card::iter().collect::<Vec<Card>>();
+            possible_cards.truncate(13);
+            for joker_possibility in possible_cards
+                .into_iter()
+                .combinations_with_replacement(joker_indices.len())
+            {
                 let mut new_hand = String::from(hand_string);
-                new_hand.replace_range(
-                    joker_index..joker_index + 1,
-                    &joker_possibility.to_char().to_string(),
-                );
-                let new_hand = Hand::from_str(&new_hand, true)?;
-                dbg!(&new_hand);
+                for (num, new_card) in joker_possibility.iter().enumerate() {
+                    new_hand.replace_range(
+                        joker_indices[num]..joker_indices[num] + 1,
+                        &new_card.to_char().to_string(),
+                    );
+                }
+
+                let new_hand = Hand::from_str(&new_hand, false)?;
                 if new_hand.hand_type > max_hand_type {
                     max_hand_type = new_hand.hand_type;
                 }
@@ -433,7 +442,13 @@ mod tests {
     #[test]
     fn test_hand_from_str_four_of_kind_joker_2() -> Result<()> {
         let hand = Hand {
-            hand: [Card::Queen, Card::Queen, Card::Queen, Card::Joker, Card::Ace],
+            hand: [
+                Card::Queen,
+                Card::Queen,
+                Card::Queen,
+                Card::Joker,
+                Card::Ace,
+            ],
             bet: 483,
             hand_type: HandType::FourOfKind,
         };
