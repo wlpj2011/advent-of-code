@@ -28,15 +28,46 @@ struct Group {
     b: bool,
 }
 
+#[derive(Debug, Clone)]
+struct Map {
+    directions: String,
+    base: Box<Node>,
+    current: Box<Node>,
+}
+
+impl Map {
+    fn from_file(file: File) -> Result<Map> {
+        let mut reader = BufReader::new(file);
+        let mut line = String::new();
+        let mut base = Node {
+            name: "AAA".to_string(),
+            left: None,
+            right: None,
+        };
+        let box_base = Box::new(base);
+        let mut new_map = Map {
+            directions: "".to_string(),
+            base: box_base,
+            current: box_base,
+        };
+
+        while reader.read_line(&mut line)? != 0 {
+            line.clear();
+        }
+
+        Ok(new_map)
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Node {
+    name: String,
+    left: Option<Box<Node>>,
+    right: Option<Box<Node>>,
+}
+
 fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
-
-    let mut reader = BufReader::new(file);
-    let mut line = String::new();
-
-    while reader.read_line(&mut line)? != 0 {
-        line.clear();
-    }
 
     Ok(result)
 }
