@@ -1,5 +1,6 @@
 // This is implementing a tree where each node has a unique element/label of type T. 
 // This is not the only thing one might implement and call a tree, but is useful for the purpose I want.
+// Actually decided I don't want a tree for what I am doing, so I will come back to this when I need a tree.
 pub struct Tree<T> {
     root: Link<T>
 }

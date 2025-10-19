@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use itertools::Itertools;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
@@ -31,27 +32,37 @@ struct Group {
 #[derive(Debug, Clone)]
 struct Map {
     directions: String,
-    base: Box<Node>,
-    current: Box<Node>,
+    map: HashMap<String, (String, String)>,
 }
 
 impl Map {
     fn from_file(file: File) -> Result<Map> {
         let mut reader = BufReader::new(file);
         let mut line = String::new();
-        let mut base = Node {
-            name: "AAA".to_string(),
-            left: None,
-            right: None,
-        };
-        let box_base = Box::new(base);
+
         let mut new_map = Map {
             directions: "".to_string(),
-            base: box_base,
-            current: box_base,
+            map: HashMap::new(),
         };
 
+        let mut done_first: bool = false;
+
         while reader.read_line(&mut line)? != 0 {
+            if !done_first {
+                new_map.directions = line.clone().strip_suffix("\n").unwrap().to_owned();
+                done_first = true;
+            } else {
+                let line_parts: Vec<_> = line.split("=").collect();
+                if line_parts.len() == 1{
+                    continue;
+                }
+                let first_part = line_parts[0].trim().to_owned();
+                let second_part = line_parts[1].trim();
+                let line_parts: Vec<_> = second_part.split(",").collect();
+                let first_dir = line_parts[0][1..].to_owned();
+                let second_dir = line_parts[1][1..line_parts[1].len() - 1].to_owned();
+                new_map.map.insert(first_part, (first_dir, second_dir));
+            }
             line.clear();
         }
 
@@ -59,15 +70,26 @@ impl Map {
     }
 }
 
-#[derive(Debug, Clone)]
-struct Node {
-    name: String,
-    left: Option<Box<Node>>,
-    right: Option<Box<Node>>,
-}
-
 fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
+
+    let map = Map::from_file(file)?;
+    let mut cur_location = "AAA".to_owned();
+    while cur_location != "ZZZ".to_owned() {
+        let cur_decision = map.map.get(&cur_location).unwrap().clone();
+        let direction_index = (result % (map.directions.len() as u64)) as usize;
+        let cur_direction = map.directions.chars().nth(direction_index).unwrap();
+        let mut cur_direction_num: usize = 0;
+        if cur_direction == 'R' {
+            cur_direction_num = 1;
+        }
+        if cur_direction_num == 0 {
+            cur_location = cur_decision.0;
+        } else if cur_direction_num == 1 {
+            cur_location = cur_decision.1;
+        }
+        result += 1;
+    }
 
     Ok(result)
 }
