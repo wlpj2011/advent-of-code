@@ -33,16 +33,18 @@ struct Group {
 struct Map {
     directions: String,
     map: HashMap<String, (String, String)>,
+    cur_locations: Vec<String>,
 }
 
 impl Map {
-    fn from_file(file: File) -> Result<Map> {
+    fn from_file_a(file: File) -> Result<Map> {
         let mut reader = BufReader::new(file);
         let mut line = String::new();
 
         let mut new_map = Map {
             directions: "".to_string(),
             map: HashMap::new(),
+            cur_locations: Vec::new(),
         };
 
         let mut done_first: bool = false;
@@ -53,7 +55,7 @@ impl Map {
                 done_first = true;
             } else {
                 let line_parts: Vec<_> = line.split("=").collect();
-                if line_parts.len() == 1{
+                if line_parts.len() == 1 {
                     continue;
                 }
                 let first_part = line_parts[0].trim().to_owned();
@@ -65,29 +67,74 @@ impl Map {
             }
             line.clear();
         }
-
+        new_map.cur_locations.push("AAA".to_owned());
         Ok(new_map)
+    }
+
+    fn from_file_b(file: File) -> Result<Map> {
+        let mut reader = BufReader::new(file);
+        let mut line = String::new();
+
+        let mut new_map = Map {
+            directions: "".to_string(),
+            map: HashMap::new(),
+            cur_locations: Vec::new(),
+        };
+
+        let mut done_first: bool = false;
+
+        while reader.read_line(&mut line)? != 0 {
+            if !done_first {
+                new_map.directions = line.clone().strip_suffix("\n").unwrap().to_owned();
+                done_first = true;
+            } else {
+                let line_parts: Vec<_> = line.split("=").collect();
+                if line_parts.len() == 1 {
+                    continue;
+                }
+                let first_part = line_parts[0].trim().to_owned();
+                let second_part = line_parts[1].trim();
+                let line_parts: Vec<_> = second_part.split(",").collect();
+                let first_dir = line_parts[0][1..].to_owned();
+                let second_dir = line_parts[1][1..line_parts[1].len() - 1].to_owned();
+                new_map.map.insert(first_part, (first_dir, second_dir));
+            }
+            line.clear();
+        }
+        for (location, (_, _)) in new_map.map.clone() {
+            if location.chars().nth(location.len() - 1).unwrap() == 'A' {
+                new_map.cur_locations.push(location.clone());
+            }
+        }
+        Ok(new_map)
+    }
+
+    fn take_step(&mut self, step_num: u64) {
+        for (path_num, cur_location) in self.cur_locations.clone().iter().enumerate() {
+            if true {//cur_location.chars().nth(cur_location.len() - 1).unwrap() != 'Z' {
+                let cur_decision = self.map.get(cur_location).unwrap().clone();
+                let direction_index = (step_num % (self.directions.len() as u64)) as usize;
+                let cur_direction = self.directions.chars().nth(direction_index).unwrap();
+                let mut cur_direction_num: usize = 0;
+                if cur_direction == 'R' {
+                    cur_direction_num = 1;
+                }
+                if cur_direction_num == 0 {
+                    self.cur_locations[path_num] = cur_decision.0;
+                } else if cur_direction_num == 1 {
+                    self.cur_locations[path_num] = cur_decision.1;
+                }
+            }
+        }
     }
 }
 
 fn solution_a(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
-    let map = Map::from_file(file)?;
-    let mut cur_location = "AAA".to_owned();
-    while cur_location != "ZZZ".to_owned() {
-        let cur_decision = map.map.get(&cur_location).unwrap().clone();
-        let direction_index = (result % (map.directions.len() as u64)) as usize;
-        let cur_direction = map.directions.chars().nth(direction_index).unwrap();
-        let mut cur_direction_num: usize = 0;
-        if cur_direction == 'R' {
-            cur_direction_num = 1;
-        }
-        if cur_direction_num == 0 {
-            cur_location = cur_decision.0;
-        } else if cur_direction_num == 1 {
-            cur_location = cur_decision.1;
-        }
+    let mut map = Map::from_file_a(file)?;
+    while map.cur_locations[0] != "ZZZ".to_owned() {
+        map.take_step(result);
         result += 1;
     }
 
@@ -97,13 +144,15 @@ fn solution_a(file: File) -> Result<u64> {
 fn solution_b(file: File) -> Result<u64> {
     let mut result: u64 = 0;
 
-    let mut reader = BufReader::new(file);
-    let mut line = String::new();
-
-    while reader.read_line(&mut line)? != 0 {
-        line.clear();
+    let mut map = Map::from_file_b(file)?;
+    while map
+        .cur_locations
+        .iter()
+        .any(|location| location.chars().nth(location.len() - 1).unwrap() != 'Z')
+    {
+        map.take_step(result);
+        result += 1;
     }
-
     Ok(result)
 }
 
@@ -120,7 +169,7 @@ fn main() -> Result<()> {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
 
-        println!("The number of steps to reach ZZZ is {result}.");
+        println!("The number of steps to reach __Z in all worlds simultaneously is {result}.");
     }
 
     Ok(())
@@ -144,14 +193,8 @@ mod tests {
     }
 
     #[test]
-    fn test_solution_b_1() -> Result<()> {
-        assert_eq!(solution_b(File::open("test-input-08-1.txt")?)?, 0);
-        Ok(())
-    }
-
-    #[test]
-    fn test_solution_b_2() -> Result<()> {
-        assert_eq!(solution_b(File::open("test-input-08-2.txt")?)?, 0);
+    fn test_solution_b() -> Result<()> {
+        assert_eq!(solution_b(File::open("test-input-08-3.txt")?)?, 6);
         Ok(())
     }
 }
