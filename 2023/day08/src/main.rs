@@ -1,6 +1,5 @@
 use anyhow::Result;
 use clap::Parser;
-use itertools::Itertools;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
@@ -142,6 +141,7 @@ fn solution_a(file: File) -> Result<u64> {
 }
 
 fn solution_b(file: File) -> Result<u64> {
+    // Should probably try redoing this for each list, and compute the gcd...
     let mut result: u64 = 0;
 
     let mut map = Map::from_file_b(file)?;
@@ -152,6 +152,13 @@ fn solution_b(file: File) -> Result<u64> {
     {
         map.take_step(result);
         result += 1;
+        if map
+        .cur_locations
+        .iter()
+        .any(|location| location.chars().nth(location.len() - 1).unwrap() == 'Z') {
+            dbg!(&result);
+            dbg!(&map.cur_locations);
+        }
     }
     Ok(result)
 }
