@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use rust_tools::math;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
@@ -108,9 +109,10 @@ impl Map {
         Ok(new_map)
     }
 
-    fn take_step(&mut self, step_num: u64) {
+    fn take_step(&mut self, step_num: u64, index_num: usize) {
         for (path_num, cur_location) in self.cur_locations.clone().iter().enumerate() {
-            if true {//cur_location.chars().nth(cur_location.len() - 1).unwrap() != 'Z' {
+            if index_num == path_num {
+                //cur_location.chars().nth(cur_location.len() - 1).unwrap() != 'Z' {
                 let cur_decision = self.map.get(cur_location).unwrap().clone();
                 let direction_index = (step_num % (self.directions.len() as u64)) as usize;
                 let cur_direction = self.directions.chars().nth(direction_index).unwrap();
@@ -133,7 +135,7 @@ fn solution_a(file: File) -> Result<u64> {
 
     let mut map = Map::from_file_a(file)?;
     while map.cur_locations[0] != "ZZZ".to_owned() {
-        map.take_step(result);
+        map.take_step(result, 0);
         result += 1;
     }
 
@@ -141,24 +143,25 @@ fn solution_a(file: File) -> Result<u64> {
 }
 
 fn solution_b(file: File) -> Result<u64> {
-    // Should probably try redoing this for each list, and compute the gcd...
-    let mut result: u64 = 0;
+    let mut results: Vec<u64> = Vec::new();
 
     let mut map = Map::from_file_b(file)?;
-    while map
-        .cur_locations
-        .iter()
-        .any(|location| location.chars().nth(location.len() - 1).unwrap() != 'Z')
-    {
-        map.take_step(result);
-        result += 1;
-        if map
-        .cur_locations
-        .iter()
-        .any(|location| location.chars().nth(location.len() - 1).unwrap() == 'Z') {
-            dbg!(&result);
-            dbg!(&map.cur_locations);
+    for (location_num, location) in map.cur_locations.clone().iter().enumerate() {
+        results.push(0);
+        while map.cur_locations[location_num]
+            .chars()
+            .nth(location.len() - 1)
+            .unwrap()
+            != 'Z'
+        {
+            let cur_result = results.pop().unwrap();
+            map.take_step(cur_result, location_num);
+            results.push(cur_result + 1);
         }
+    }
+    let mut result = results.pop().unwrap();
+    while results.len() >= 1 {
+        result = math::lcm(result, results.pop().unwrap());
     }
     Ok(result)
 }

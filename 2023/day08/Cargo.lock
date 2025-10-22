@@ -154,6 +154,7 @@ dependencies = [
  "anyhow",
  "clap",
  "itertools",
+ "rust-tools",
  "thiserror",
  "tqdm",
 ]
@@ -279,6 +280,10 @@ checksum = "ed2bf2547551a7053d6fdfafda3f938979645c44812fbfcda098faae3f1a362d"
 dependencies = [
  "bitflags 2.9.4",
 ]
+
+[[package]]
+name = "rust-tools"
+version = "0.1.0"
 
 [[package]]
 name = "scopeguard"

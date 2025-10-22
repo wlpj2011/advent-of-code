@@ -1,2 +1,3 @@
 pub mod list;
-pub mod tree;
+mod tree;
+pub mod math;
