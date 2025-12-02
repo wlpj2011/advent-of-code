@@ -1,0 +1,12 @@
+[package]
+name = "day01"
+version = "1.0.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.99"
+clap = { version = "4.5.45", features = ["derive"] }
+itertools = "0.14.0"
+thiserror = "2.0.16"
+tqdm = "0.8.0"
+rust-tools = {version = "0.1.0", path="../../rust-tools"}
