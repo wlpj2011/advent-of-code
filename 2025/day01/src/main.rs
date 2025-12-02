@@ -27,6 +27,46 @@ struct Group {
     b: bool,
 }
 
+#[derive(Debug)]
+struct Lock {
+    size: i32,
+    current_val: i32,
+}
+
+impl Lock {
+    fn new(size: i32, current_val: i32) -> Self{
+        Lock {size, current_val}
+    }
+
+    fn rotate(&mut self, rot: Rotation) -> bool {
+        self.current_val = (self.current_val + (rot.direction * rot.distance)) % self.size;
+        self.current_val == 0
+    }
+}
+
+#[derive(Debug)]
+struct Rotation {
+    direction: i32,
+    distance: i32,
+}
+
+impl Rotation {
+    fn new_from_str(string: String) -> Result<Rotation> {
+        let mut direction = 0;
+        let distance: i32;
+        let dir = string.chars().next().unwrap();
+        if dir == 'R' {
+            direction = 1;
+        } else if dir == 'L' {
+            direction = -1;
+        }
+        let mut chars = string.chars();
+        chars.next();
+        let string = chars.as_str();
+        distance = string.trim().parse()?;
+        Ok(Rotation {direction, distance})
+    }
+}
 
 
 
@@ -35,9 +75,12 @@ fn solution_a(file: File) -> Result<i64> {
     let mut reader = BufReader::new(file);
     let mut line = String::new();
     let mut result = 0;
-
+    let mut lock = Lock::new(100, 50);
     while reader.read_line(&mut line)? != 0 {
-
+        let rot = Rotation::new_from_str(line.clone())?;
+        if lock.rotate(rot){
+            result += 1;
+        }
         line.clear();
     }
 
