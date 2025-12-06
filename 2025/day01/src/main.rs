@@ -42,6 +42,17 @@ impl Lock {
         self.current_val = (self.current_val + (rot.direction * rot.distance)) % self.size;
         self.current_val == 0
     }
+    
+    fn rotate_count(&mut self, rot: Rotation) -> i32 {
+        let mut count = 0;
+        for _ in 0..=rot.distance {
+            self.current_val = (self.current_val + (rot.direction)) % self.size;
+            if self.current_val == 0{
+                count += 1;
+            }
+        }
+        count
+    }
 }
 
 #[derive(Debug)]
@@ -91,12 +102,14 @@ fn solution_b(file: File) -> Result<i64> {
     let mut reader = BufReader::new(file);
     let mut line = String::new();
     let mut result = 0;
-
+    let mut lock = Lock::new(100, 50);
     while reader.read_line(&mut line)? != 0 {
+        let rot = Rotation::new_from_str(line.clone())?;
+        result += lock.rotate_count(rot);
         line.clear();
     }
 
-    Ok(result)
+    Ok(result.into())
 }
 
 fn main() -> Result<()> {
@@ -112,7 +125,7 @@ fn main() -> Result<()> {
         let file = File::open(args.file.clone())?;
         let result = solution_b(file)?;
 
-        println!("The furthest point from the starting position is {result} steps along the loop.");
+        println!("The password for the door is actually {result}.");
     }
 
     Ok(())
@@ -131,7 +144,7 @@ mod tests {
 
     #[test]
     fn test_solution_b() -> Result<()> {
-        assert_eq!(solution_b(File::open("test-input-01.txt")?)?, 0);
+        assert_eq!(solution_b(File::open("test-input-01.txt")?)?, 6);
         Ok(())
     }
 
