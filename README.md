@@ -3,7 +3,7 @@ wlpj2011's advent of code solutions. Starting with 2024, but will probably add o
 
 ## Current progress 
 * 2015 
-  * Python - 1 :star:
+  * Python - 1 :star: / 50
 * 2016 
 * 2017
 * 2018
@@ -12,9 +12,9 @@ wlpj2011's advent of code solutions. Starting with 2024, but will probably add o
 * 2021
 * 2022
 * 2023 
-  * Rust - 18 :star:
+  * Rust - 18 :star:  / 50
   * 5b needs a better solution current solution works but takes ~3 hours to run. Could probably do something based on comparing intervals directly with some sort of binary splitting to narrow down the overlap point.
 * 2024 
-  * Python - 11 :star:
+  * Python - 11 :star: / 50
 * 2025 
-  * Rust - 1 :star:
+  * Rust - 2 :star: / 24

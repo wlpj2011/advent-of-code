@@ -39,14 +39,14 @@ impl Lock {
     }
 
     fn rotate(&mut self, rot: Rotation) -> bool {
-        self.current_val = (self.current_val + (rot.direction * rot.distance)) % self.size;
+        self.current_val = (self.current_val + (rot.direction * rot.distance)).rem_euclid(self.size);
         self.current_val == 0
     }
     
     fn rotate_count(&mut self, rot: Rotation) -> i32 {
         let mut count = 0;
-        for _ in 0..=rot.distance {
-            self.current_val = (self.current_val + (rot.direction)) % self.size;
+        for _ in 0..rot.distance {
+            self.current_val = (self.current_val + (rot.direction)).rem_euclid(self.size);
             if self.current_val == 0{
                 count += 1;
             }
